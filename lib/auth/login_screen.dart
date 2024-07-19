@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guard_property_management/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../api_bloc/login_bloc/login_apiblock_bloc.dart';
+import '../api_bloc/bloc/login_bloc/login_apiblock_bloc.dart';
 
 class login_page extends StatefulWidget {
   const login_page({Key? key});
@@ -125,7 +125,7 @@ class _login_pageState extends State<login_page> {
                         if (state.loginModel.data != null) {
                           SetLogin(state.loginModel.apiAccessToken!);
                           SetUserId(state.loginModel.data!.id.toString());
-                          SetUserOwner(state.loginModel.data!.inRelation.toString());
+                          SetProfilePic(state.loginModel.data!.profileImage.toString());
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
@@ -250,11 +250,11 @@ class _login_pageState extends State<login_page> {
       print('Login_user_id :' + user_id);
     });
   }
-  Future<void> SetUserOwner(String user) async {
+  Future<void> SetProfilePic(String profile_pic) async {
     final SharedPreferences prefs = await _prefs;
     setState(() {
-      prefs.setString('Login_User/Owner', user);
-      print('Login_User/Owner :' + user);
+      prefs.setString('user_pic', profile_pic);
+      print('user_pic :' + profile_pic);
     });
   }
 }

@@ -16,9 +16,19 @@ class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
   bool isLoading = false;
 
+  String? _profilePic;
+
   @override
   void initState() {
     super.initState();
+    _loadProfilePic();
+  }
+
+  Future<void> _loadProfilePic() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _profilePic = prefs.getString('user_pic');
+    });
   }
 
   @override
@@ -43,7 +53,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       CircleAvatar(
                         radius: 24,
                         backgroundColor: Colors.white,
-                        backgroundImage: AssetImage('assets/Home.png'),
+                        backgroundImage: _profilePic != null
+                            ?  NetworkImage(_profilePic!):AssetImage('assets/Home.png'),
                       ),
                       SizedBox(width: 15),
                       Text(
@@ -88,6 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           SizedBox(height: 10),
                           Text('Visitor Request',style: TextStyle(fontSize: 18),),
                           TabBar(
+                            unselectedLabelColor: Colors.black,
+                            labelColor: Colors.blue,
                             indicatorSize: TabBarIndicatorSize.tab,
                             indicator: UnderlineTabIndicator(
                               borderSide: BorderSide(
@@ -256,7 +269,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                         },
                                       ),
                                     ),
-                                    Container(height: 10,color: Colors.red,),
+                      ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: Icon(Icons.add),
+                        label: Text('Add Visitor'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor:
+                          Color(0xFF3629B7),
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 30,
+                              vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(25),
+                          ),
+                        ),
+                      ),
                                   ],
                                 ),
                               ],

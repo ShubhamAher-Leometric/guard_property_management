@@ -43,16 +43,16 @@ class Data {
   String? name;
   String? email;
   String? mobileNumber;
-  bool? inRelation;
+  String? profileImage;
 
-  Data({this.id, this.name, this.email, this.mobileNumber, this.inRelation});
+  Data({this.id, this.name, this.email, this.mobileNumber, this.profileImage});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     email = json['email'];
     mobileNumber = json['mobile_number'];
-    inRelation = json['in-relation'];
+    profileImage = json['profile_image'];
   }
 
   Map<String, dynamic> toJson() {
@@ -61,7 +61,7 @@ class Data {
     data['name'] = this.name;
     data['email'] = this.email;
     data['mobile_number'] = this.mobileNumber;
-    data['in-relation'] = this.inRelation;
+    data['profile_image'] = this.profileImage;
     return data;
   }
 }

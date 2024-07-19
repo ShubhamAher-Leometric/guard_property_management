@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 
-import '../../model/LoginModel.dart';
-import '../repository/LoginRepository.dart';
+import '../../../model/LoginModel.dart';
+import '../../repository/LoginRepository.dart';
 
 
 

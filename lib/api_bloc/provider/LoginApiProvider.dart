@@ -11,7 +11,7 @@ class LoginApiProvider {
     if (isInternet) {
       print("Send Login Request");
       print(sendLoginOtpData);
-      final String _url = AppConstants.BASE_URL + '/api/login';
+      final String _url = AppConstants.BASE_URL + '/api/guard-login';
       Response response = await _dio.post(
         _url,
         options: Options(
