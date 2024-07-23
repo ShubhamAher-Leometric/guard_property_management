@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guard_property_management/auth/reset_password.dart';
 import 'package:guard_property_management/screens/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -95,28 +96,28 @@ class _login_pageState extends State<login_page> {
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.012),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.end,
-                //   children: [
-                //     Padding(
-                //       padding: const EdgeInsets.only(right: 3),
-                //       child: TextButton(
-                //         onPressed: () {
-                //           Navigator.push(
-                //             context,
-                //             MaterialPageRoute(
-                //               builder: (context) => ResetPassword(),
-                //             ),
-                //           );
-                //         },
-                //         child: const Text(
-                //           'Forgot Password?',
-                //           style: TextStyle(fontSize: 16, color: Colors.grey),
-                //         ),
-                //       ),
-                //     ),
-                //   ],
-                // ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(right: 3),
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ResetPassword(),
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          'Forgot Password?',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
                 BlocProvider(
                   create: (context) => _loginApiBloc,
                   child: BlocListener<LoginApiblockBloc, LoginApiblockState>(
