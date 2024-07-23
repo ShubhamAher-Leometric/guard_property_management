@@ -42,15 +42,23 @@ class Data {
   int? id;
   String? name;
   String? email;
+  int? propertyId;
   String? mobileNumber;
   String? profileImage;
 
-  Data({this.id, this.name, this.email, this.mobileNumber, this.profileImage});
+  Data(
+      {this.id,
+        this.name,
+        this.email,
+        this.propertyId,
+        this.mobileNumber,
+        this.profileImage});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     email = json['email'];
+    propertyId = json['property_id'];
     mobileNumber = json['mobile_number'];
     profileImage = json['profile_image'];
   }
@@ -60,6 +68,7 @@ class Data {
     data['id'] = this.id;
     data['name'] = this.name;
     data['email'] = this.email;
+    data['property_id'] = this.propertyId;
     data['mobile_number'] = this.mobileNumber;
     data['profile_image'] = this.profileImage;
     return data;

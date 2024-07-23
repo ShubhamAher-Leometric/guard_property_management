@@ -126,6 +126,9 @@ class _login_pageState extends State<login_page> {
                           SetLogin(state.loginModel.apiAccessToken!);
                           SetUserId(state.loginModel.data!.id.toString());
                           SetProfilePic(state.loginModel.data!.profileImage.toString());
+                          SetPropertyId(state.loginModel.data!.propertyId.toString());
+                          SetNotificationfilter('this_month');
+                          setSelectedTab('owner');
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
@@ -235,12 +238,21 @@ class _login_pageState extends State<login_page> {
     );
   }
 
+
+
   Future<void> SetLogin(String token) async {
     final SharedPreferences prefs = await _prefs;
     setState(() {
       prefs.setBool("IS_LOGIN", true);
       prefs.setString('TOKEN', token);
       print('User Auth Token :' + token);
+    });
+  }
+  Future<void> SetPropertyId(String property_id) async {
+    final SharedPreferences prefs = await _prefs;
+    setState(() {
+      prefs.setString('Guard_property_id', property_id);
+      print('Guard_property_id :' + property_id);
     });
   }
   Future<void> SetUserId(String user_id) async {
@@ -256,5 +268,18 @@ class _login_pageState extends State<login_page> {
       prefs.setString('user_pic', profile_pic);
       print('user_pic :' + profile_pic);
     });
+  }
+
+  Future<void> SetNotificationfilter(String notification_filter) async {
+    final SharedPreferences prefs = await _prefs;
+    setState(() {
+      prefs.setString('notification_filter', notification_filter);
+      print('notification_filter :' + notification_filter);
+    });
+  }
+  Future<void> setSelectedTab(String tabName) async {
+    final SharedPreferences prefs = await _prefs;
+    await prefs.setString('selected_tab', tabName);
+    print('Selected Tab: $tabName');
   }
 }
