@@ -128,7 +128,7 @@ class _login_pageState extends State<login_page> {
                           SetUserId(state.loginModel.data!.id.toString());
                           SetProfilePic(state.loginModel.data!.profileImage.toString());
                           SetPropertyId(state.loginModel.data!.propertyId.toString());
-                          SetNotificationfilter('this_month');
+                          Setdatefilter('this_month');
                           setSelectedTab('owner');
                           Navigator.pushAndRemoveUntil(
                             context,
@@ -271,11 +271,11 @@ class _login_pageState extends State<login_page> {
     });
   }
 
-  Future<void> SetNotificationfilter(String notification_filter) async {
+  Future<void> Setdatefilter(String date_filter) async {
     final SharedPreferences prefs = await _prefs;
     setState(() {
-      prefs.setString('notification_filter', notification_filter);
-      print('notification_filter :' + notification_filter);
+      prefs.setString('visitor_filter', date_filter);
+      print('visitor_filter :' + date_filter);
     });
   }
   Future<void> setSelectedTab(String tabName) async {

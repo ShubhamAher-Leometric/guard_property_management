@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guard_property_management/api_bloc/bloc/visitor_list_bloc/visitor_listing_bloc.dart';
+import 'package:guard_property_management/screens/new_visitor.dart';
 import 'package:guard_property_management/screens/settings_screen.dart';
+import 'package:guard_property_management/screens/visitor_details_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    Setdatefilter('this_month');
+    setSelectedTab('owner');
     _loadProfilePic();
     _initVisitorList();
   }
@@ -130,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500,
                                       color: selected == 'Owner'
-                                          ?  Color(0xFF3629B7)
+                                          ? Color(0xFF3629B7)
                                           : Colors.grey,
                                     ),
                                   ),
@@ -140,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: MediaQuery.of(context).size.width / 2 -
                                       40,
                                   color: selected == 'Owner'
-                                      ?  Color(0xFF3629B7)
+                                      ? Color(0xFF3629B7)
                                       : Colors.grey,
                                 ),
                               ],
@@ -164,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500,
                                       color: selected == 'Me'
-                                          ?   Color(0xFF3629B7)
+                                          ? Color(0xFF3629B7)
                                           : Colors.grey,
                                     ),
                                   ),
@@ -174,7 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   width: MediaQuery.of(context).size.width / 2 -
                                       40,
                                   color: selected == 'Me'
-                                      ?   Color(0xFF3629B7)
+                                      ? Color(0xFF3629B7)
                                       : Colors.grey,
                                 ),
                               ],
@@ -221,12 +225,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               VisitorListingState>(
                             builder: (context, state) {
                               if (state is VisitorListingLoading) {
-                                return Expanded(child:
-                                Center(
-                                   child: Container(
+                                return Expanded(
+                                    child: Center(
+                                  child: Container(
                                     height: 30,
                                     width: 30,
-                                    child: CircularProgressIndicator(color: Colors.grey,),
+                                    child: CircularProgressIndicator(
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                 ));
                               } else if (state is VisitorListingLoaded) {
@@ -237,6 +243,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                         state.vistorListingModel.data!.length,
                                     itemBuilder: (context, index) {
                                       return GestureDetector(
+                                        onTap: () {
+                                          SetVisitordetials(state
+                                              .vistorListingModel
+                                              .data![index]
+                                              .visitId
+                                              .toString());
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    VisitorDetailsScreen()),
+                                          );
+                                        },
                                         child: Container(
                                           height: 86,
                                           margin: EdgeInsets.only(
@@ -310,7 +329,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   children: [
                                                     Row(
                                                       children: [
-                                                        Icon(Icons.calendar_month,size: 16,color: Color(0xFF3629B7),),
+                                                        Icon(
+                                                          Icons.calendar_month,
+                                                          size: 16,
+                                                          color:
+                                                              Color(0xFF3629B7),
+                                                        ),
                                                         Container(
                                                           width: 100,
                                                           child: Text(
@@ -321,10 +345,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                 .toString(),
                                                             style: TextStyle(
                                                               fontSize: 16,
-                                                              color: Colors.black,
+                                                              color:
+                                                                  Colors.black,
                                                             ),
-                                                            overflow: TextOverflow
-                                                                .visible,
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .visible,
                                                             maxLines: 1,
                                                           ),
                                                         ),
@@ -332,7 +358,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     ),
                                                     Row(
                                                       children: [
-                                                        Icon(Icons.call,size: 16,color: Color(0xFF3629B7),),
+                                                        Icon(
+                                                          Icons.call,
+                                                          size: 16,
+                                                          color:
+                                                              Color(0xFF3629B7),
+                                                        ),
                                                         Text(
                                                           state
                                                               .vistorListingModel
@@ -343,8 +374,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             fontSize: 16,
                                                             color: Colors.black,
                                                           ),
-                                                          overflow:
-                                                              TextOverflow.visible,
+                                                          overflow: TextOverflow
+                                                              .visible,
                                                           maxLines: 2,
                                                         ),
                                                       ],
@@ -367,19 +398,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         if (selected == 'Me')
-                       ElevatedButton.icon(
-                                    onPressed: () {},
-                                    icon: Icon(Icons.add),
-                                    label: Text('Add Visitor'),
-                                    style: ElevatedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      backgroundColor: Color(0xFF3629B7),
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 30, vertical: 15),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(25),
-                                      ),),),
+                          ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AddNewVisitor()),
+                              );
+                            },
+                            icon: Icon(Icons.add),
+                            label: Text('Add Visitor'),
+                            style: ElevatedButton.styleFrom(
+                              foregroundColor: Colors.white,
+                              backgroundColor: Color(0xFF3629B7),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 30, vertical: 15),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(25),
+                              ),
+                            ),
+                          ),
                       ],
                     ),
                     // child: DefaultTabController(
@@ -918,17 +956,25 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> SetVisitordetials(String visitor_id) async {
+    final SharedPreferences prefs = await _prefs;
+    setState(() {
+      prefs.setString('visitor_id', visitor_id);
+      print('visitor_id :' + visitor_id);
+    });
+  }
+
   Future<void> setSelectedTab(String tabName) async {
     final SharedPreferences prefs = await _prefs;
     await prefs.setString('selected_tab', tabName);
     print('Selected Tab: $tabName');
   }
 
-  Future<void> SetVisitorListfilter(String notification_filter) async {
+  Future<void> SetVisitorListfilter(String date_filter) async {
     final SharedPreferences prefs = await _prefs;
     String filterValue;
 
-    switch (notification_filter) {
+    switch (date_filter) {
       case 'All':
         filterValue = 'all';
         break;
@@ -951,6 +997,14 @@ class _HomeScreenState extends State<HomeScreen> {
       prefs.setString('visitor_filter', filterValue);
       print('visitor_filter :' + filterValue);
       _initVisitorList();
+    });
+  }
+
+  Future<void> Setdatefilter(String date_filter) async {
+    final SharedPreferences prefs = await _prefs;
+    setState(() {
+      prefs.setString('visitor_filter', date_filter);
+      print('visitor_filter :' + date_filter);
     });
   }
 
