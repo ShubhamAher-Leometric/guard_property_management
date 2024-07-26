@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guard_property_management/screens/visitor_details_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../api_bloc/bloc/visitor_history_bloc/visitor_history_bloc.dart';
 import '../api_bloc/bloc/visitor_list_bloc/visitor_listing_bloc.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -15,7 +16,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-  VisitorListingBloc _visitorListingBloc = VisitorListingBloc();
+  VisitorHistoryBloc _visitorListingBloc = VisitorHistoryBloc();
   String _selectedDateFilter = 'This Month';
   String selected = 'Owner';
 
@@ -28,7 +29,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Future<void> _initVisitorList() async {
-    _visitorListingBloc.add(VisitorListEventData());
+    _visitorListingBloc.add(VisitorHistoryEventData());
   }
 
   @override
@@ -190,10 +191,10 @@ class _HistoryPageState extends State<HistoryPage> {
             ),
             BlocProvider(
               create: (context) => _visitorListingBloc,
-              child: BlocBuilder<VisitorListingBloc,
-                  VisitorListingState>(
+              child: BlocBuilder<VisitorHistoryBloc,
+                  VisitorHistoryState>(
                 builder: (context, state) {
-                  if (state is VisitorListingLoading) {
+                  if (state is VisitorHistoryLoading) {
                     return Expanded(
                         child: Center(
                           child: Container(
@@ -204,17 +205,17 @@ class _HistoryPageState extends State<HistoryPage> {
                             ),
                           ),
                         ));
-                  } else if (state is VisitorListingLoaded) {
+                  } else if (state is VisitorHistoryLoaded) {
                     return Expanded(
                       child: ListView.builder(
                         padding: EdgeInsets.zero,
                         itemCount:
-                        state.vistorListingModel.data!.length,
+                        state.visitorHistoryModel.data!.length,
                         itemBuilder: (context, index) {
                           return GestureDetector(
                             onTap: () {
                               SetVisitordetials(state
-                                  .vistorListingModel
+                                  .visitorHistoryModel
                                   .data![index]
                                   .visitId
                                   .toString());
@@ -262,7 +263,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                             .center,
                                         children: [
                                           Text(
-                                            state.vistorListingModel
+                                            state.visitorHistoryModel
                                                 .data![index].name
                                                 .toString(),
                                             style: TextStyle(
@@ -275,7 +276,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                           ),
                                           Text(
                                             state
-                                                .vistorListingModel
+                                                .visitorHistoryModel
                                                 .data![index]
                                                 .unitInfo
                                                 .toString(),
@@ -308,7 +309,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                               width: 100,
                                               child: Text(
                                                 state
-                                                    .vistorListingModel
+                                                    .visitorHistoryModel
                                                     .data![index]
                                                     .visitDate
                                                     .toString(),
@@ -335,7 +336,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                             ),
                                             Text(
                                               state
-                                                  .vistorListingModel
+                                                  .visitorHistoryModel
                                                   .data![index]
                                                   .mobileNumber
                                                   .toString(),
