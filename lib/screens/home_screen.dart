@@ -343,25 +343,121 @@ class _HomeScreenState extends State<HomeScreen> {
                                           child: Padding(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 10),
-                                            child: Row(
+                                            child: Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Container(
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width /
-                                                      2.2,
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
+                                                Row(
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          2.2,
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Text(
+                                                            state.vistorListingModel
+                                                                .data![index].name
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: Colors.black,
+                                                            ),
+                                                            overflow: TextOverflow
+                                                                .visible,
+                                                            maxLines: 2,
+                                                          ),
+                                                          Text(
+                                                            state
+                                                                .vistorListingModel
+                                                                .data![index]
+                                                                .unitInfo
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              color: Colors.black,
+                                                            ),
+                                                            overflow: TextOverflow
+                                                                .visible,
+                                                            maxLines: 2,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment.start,
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.center,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.calendar_month,
+                                                              size: 16,
+                                                              color:
+                                                                  Color(0xFF3629B7),
+                                                            ),
+                                                            Container(
+                                                              width: 100,
+                                                              child: Text(
+                                                                state
+                                                                    .vistorListingModel
+                                                                    .data![index]
+                                                                    .visitDate
+                                                                    .toString(),
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  color:
+                                                                      Colors.black,
+                                                                ),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .visible,
+                                                                maxLines: 1,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Icon(
+                                                              Icons.call,
+                                                              size: 16,
+                                                              color:
+                                                                  Color(0xFF3629B7),
+                                                            ),
+                                                            Text(
+                                                              state
+                                                                  .vistorListingModel
+                                                                  .data![index]
+                                                                  .mobileNumber
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors.black,
+                                                              ),
+                                                              overflow: TextOverflow
+                                                                  .visible,
+                                                              maxLines: 2,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                                if(selected == 'Other')
+                                                  Row(
                                                     children: [
                                                       Text(
-                                                        state.vistorListingModel
-                                                            .data![index].name
-                                                            .toString(),
+                                                        'Created by : ',
                                                         style: TextStyle(
                                                           fontSize: 16,
                                                           color: Colors.black,
@@ -374,7 +470,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         state
                                                             .vistorListingModel
                                                             .data![index]
-                                                            .unitInfo
+                                                            .createdBy
                                                             .toString(),
                                                         style: TextStyle(
                                                           fontSize: 16,
@@ -385,69 +481,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         maxLines: 2,
                                                       ),
                                                     ],
-                                                  ),
-                                                ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.calendar_month,
-                                                          size: 16,
-                                                          color:
-                                                              Color(0xFF3629B7),
-                                                        ),
-                                                        Container(
-                                                          width: 100,
-                                                          child: Text(
-                                                            state
-                                                                .vistorListingModel
-                                                                .data![index]
-                                                                .visitDate
-                                                                .toString(),
-                                                            style: TextStyle(
-                                                              fontSize: 16,
-                                                              color:
-                                                                  Colors.black,
-                                                            ),
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .visible,
-                                                            maxLines: 1,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Row(
-                                                      children: [
-                                                        Icon(
-                                                          Icons.call,
-                                                          size: 16,
-                                                          color:
-                                                              Color(0xFF3629B7),
-                                                        ),
-                                                        Text(
-                                                          state
-                                                              .vistorListingModel
-                                                              .data![index]
-                                                              .mobileNumber
-                                                              .toString(),
-                                                          style: TextStyle(
-                                                            fontSize: 16,
-                                                            color: Colors.black,
-                                                          ),
-                                                          overflow: TextOverflow
-                                                              .visible,
-                                                          maxLines: 2,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
+                                                  )
                                               ],
                                             ),
                                           ),

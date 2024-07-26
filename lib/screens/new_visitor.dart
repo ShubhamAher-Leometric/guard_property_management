@@ -1,8 +1,6 @@
-
 import 'dart:convert';
 import 'dart:io';
 import 'package:guard_property_management/model/block.dart' as BlockModel;
-import 'package:guard_property_management/model/property.dart' as PropertyModel;
 import 'package:guard_property_management/model/floor.dart' as FloorModel;
 import 'package:guard_property_management/model/unit.dart' as UnitModel;
 import 'package:flutter/material.dart';
@@ -11,7 +9,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:intl/intl.dart';
 import '../api_bloc/api_service.dart';
 import '../constant.dart';
 
@@ -60,6 +58,8 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
   int? blockId;
   int? floorId;
   int? unitId;
+  DateTime? _visitDateTime;
+  DateTime? _expiryDateTime;
 
   File? _image;
   final ImagePicker _picker = ImagePicker();
@@ -265,7 +265,7 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
     request.fields['remark'] = _remarkController.text;
     request.fields['expired_time'] = _expirytimeController.text;
     request.fields['added_by'] = 'guard';
-
+    request.fields['guard_id'] = prefs.getString('Login_user_id')!;
 
     if (_image != null) {
       request.files.add(
@@ -331,24 +331,35 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
     super.dispose();
   }
 
+  Future<void> _selectDate(BuildContext context, TextEditingController controller, {required bool isVisitDate}) async {
+    DateTime now = DateTime.now();
+    DateTime initialDate = now;
+    DateTime? firstDate;
 
-  Future<void> _selectDate(BuildContext context, TextEditingController controller, {DateTime? firstDate}) async {
-    final DateTime now = DateTime.now();
-    final DateTime initialDate = firstDate ?? now;
+    if (!isVisitDate && _visitDateTime != null) {
+      firstDate = _visitDateTime;
+    }
+
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: initialDate,
-      firstDate: initialDate,
+      initialDate: firstDate ?? initialDate,
+      firstDate: firstDate ?? initialDate,
       lastDate: DateTime(2101),
     );
+
     if (picked != null) {
       setState(() {
-        controller.text = "${picked.day.toString().padLeft(2, '0')}-${picked.month.toString().padLeft(2, '0')}-${picked.year}";
+        controller.text = DateFormat('dd-MM-yyyy').format(picked);
+        if (isVisitDate) {
+          _visitDateTime = picked;
+        } else {
+          _expiryDateTime = picked;
+        }
       });
     }
   }
 
-  Future<void> _selectTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectTime(BuildContext context, TextEditingController controller, {required bool isVisitTime}) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -359,15 +370,40 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
         );
       },
     );
+
     if (picked != null) {
       setState(() {
         final now = DateTime.now();
-        final time = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
-        final formattedTime = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
-        controller.text = formattedTime; // Save time in 24-hour format
+        final selectedTime = DateTime(now.year, now.month, now.day, picked.hour, picked.minute);
+        final formattedTime = '${selectedTime.hour.toString().padLeft(2, '0')}:${selectedTime.minute.toString().padLeft(2, '0')}';
+
+        if (isVisitTime) {
+          _visitDateTime = DateTime(_visitDateTime?.year ?? now.year, _visitDateTime?.month ?? now.month, _visitDateTime?.day ?? now.day, picked.hour, picked.minute);
+          controller.text = formattedTime;
+        } else {
+          if (_visitDateTime != null &&
+              _expiryDateTime != null &&
+              _expiryDateTime!.year == _visitDateTime!.year &&
+              _expiryDateTime!.month == _visitDateTime!.month &&
+              _expiryDateTime!.day == _visitDateTime!.day) {
+            final expiryDateTime = DateTime(_visitDateTime!.year, _visitDateTime!.month, _visitDateTime!.day, picked.hour, picked.minute);
+            if (expiryDateTime.isBefore(_visitDateTime!)) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(backgroundColor: Colors.red,
+                    content: Text('Expiry time cannot be earlier than visit time.')),
+              );
+              return;
+            }
+            _expiryDateTime = expiryDateTime;
+          } else {
+            _expiryDateTime = DateTime(_expiryDateTime?.year ?? now.year, _expiryDateTime?.month ?? now.month, _expiryDateTime?.day ?? now.day, picked.hour, picked.minute);
+          }
+          controller.text = formattedTime;
+        }
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -524,14 +560,18 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                 },
               ),
              const SizedBox(height: 16),
-             const Text(
+
+
+
+
+              const Text(
                 'Visit Date',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
-           const   SizedBox(height: 6),
+              const SizedBox(height: 6),
               GestureDetector(
                 onTap: () {
-                  _selectDate(context,_dateController); // Open calendar when the icon is tapped
+                  _selectDate(context, _dateController, isVisitDate: true); // Open calendar when the icon is tapped
                 },
                 child: AbsorbPointer(
                   child: TextField(
@@ -547,15 +587,15 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                   ),
                 ),
               ),
-            const  SizedBox(height: 16),
+              const SizedBox(height: 16),
               const Text(
                 'Visit Time',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
-              const   SizedBox(height: 6),
+              const SizedBox(height: 6),
               GestureDetector(
                 onTap: () {
-                  _selectTime(context,_timeController); // Open calendar when the icon is tapped
+                  _selectTime(context, _timeController, isVisitTime: true); // Open calendar when the icon is tapped
                 },
                 child: AbsorbPointer(
                   child: TextField(
@@ -571,15 +611,15 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                   ),
                 ),
               ),
-              const  SizedBox(height: 16),
+              const SizedBox(height: 16),
               const Text(
                 'Expiry Date',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
-              const   SizedBox(height: 6),
+              const SizedBox(height: 6),
               GestureDetector(
                 onTap: () {
-                  _selectDate(context,_expirydateController); // Open calendar when the icon is tapped
+                  _selectDate(context, _expirydateController, isVisitDate: false); // Open calendar when the icon is tapped
                 },
                 child: AbsorbPointer(
                   child: TextField(
@@ -595,15 +635,15 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                   ),
                 ),
               ),
-              const  SizedBox(height: 16),
+              const SizedBox(height: 16),
               const Text(
                 'Expiry Time',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
-              const   SizedBox(height: 6),
+              const SizedBox(height: 6),
               GestureDetector(
                 onTap: () {
-                  _selectTime(context,_expirytimeController); // Open calendar when the icon is tapped
+                  _selectTime(context, _expirytimeController, isVisitTime: false); // Open calendar when the icon is tapped
                 },
                 child: AbsorbPointer(
                   child: TextField(
@@ -619,6 +659,8 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                   ),
                 ),
               ),
+
+
 
 
 

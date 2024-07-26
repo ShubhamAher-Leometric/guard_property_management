@@ -39,6 +39,7 @@ class Data {
   String? mobileNumber;
   String? visitDate;
   String? status;
+  String? createdBy;
 
   Data(
       {this.visitId,
@@ -46,7 +47,8 @@ class Data {
         this.name,
         this.mobileNumber,
         this.visitDate,
-        this.status});
+        this.status,
+        this.createdBy});
 
   Data.fromJson(Map<String, dynamic> json) {
     visitId = json['visit_id'];
@@ -55,6 +57,7 @@ class Data {
     mobileNumber = json['mobile_number'];
     visitDate = json['visit_date'];
     status = json['status'];
+    createdBy = json['created_by'];
   }
 
   Map<String, dynamic> toJson() {
@@ -65,6 +68,7 @@ class Data {
     data['mobile_number'] = this.mobileNumber;
     data['visit_date'] = this.visitDate;
     data['status'] = this.status;
+    data['created_by'] = this.createdBy;
     return data;
   }
 }

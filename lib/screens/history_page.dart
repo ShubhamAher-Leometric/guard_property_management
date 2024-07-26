@@ -247,111 +247,146 @@ class _HistoryPageState extends State<HistoryPage> {
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 10),
-                                child: Row(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Container(
-                                      width: MediaQuery.of(context)
-                                          .size
-                                          .width /
-                                          2.2,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment
-                                            .start,
-                                        mainAxisAlignment:
-                                        MainAxisAlignment
-                                            .center,
-                                        children: [
-                                          Text(
-                                            state.visitorHistoryModel
-                                                .data![index].name
-                                                .toString(),
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow
-                                                .visible,
-                                            maxLines: 2,
-                                          ),
-                                          Text(
-                                            state
-                                                .visitorHistoryModel
-                                                .data![index]
-                                                .unitInfo
-                                                .toString(),
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
-                                            ),
-                                            overflow: TextOverflow
-                                                .visible,
-                                            maxLines: 2,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.center,
+                                    Row(
                                       children: [
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.calendar_month,
-                                              size: 16,
-                                              color:
-                                              Color(0xFF3629B7),
-                                            ),
-                                            Container(
-                                              width: 100,
-                                              child: Text(
-                                                state
-                                                    .visitorHistoryModel
-                                                    .data![index]
-                                                    .visitDate
+                                        Container(
+                                          width: MediaQuery.of(context)
+                                              .size
+                                              .width /
+                                              2.2,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment
+                                                .start,
+                                            mainAxisAlignment:
+                                            MainAxisAlignment
+                                                .center,
+                                            children: [
+                                              Text(
+                                                state.visitorHistoryModel
+                                                    .data![index].name
                                                     .toString(),
                                                 style: TextStyle(
                                                   fontSize: 16,
-                                                  color:
-                                                  Colors.black,
+                                                  color: Colors.black,
                                                 ),
-                                                overflow:
-                                                TextOverflow
+                                                overflow: TextOverflow
                                                     .visible,
-                                                maxLines: 1,
+                                                maxLines: 2,
                                               ),
-                                            ),
-                                          ],
+                                              Text(
+                                                state
+                                                    .visitorHistoryModel
+                                                    .data![index]
+                                                    .unitInfo
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black,
+                                                ),
+                                                overflow: TextOverflow
+                                                    .visible,
+                                                maxLines: 2,
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                        Row(
+                                        Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                           children: [
-                                            Icon(
-                                              Icons.call,
-                                              size: 16,
-                                              color:
-                                              Color(0xFF3629B7),
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_month,
+                                                  size: 16,
+                                                  color:
+                                                  Color(0xFF3629B7),
+                                                ),
+                                                Container(
+                                                  width: 100,
+                                                  child: Text(
+                                                    state
+                                                        .visitorHistoryModel
+                                                        .data![index]
+                                                        .visitDate
+                                                        .toString(),
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color:
+                                                      Colors.black,
+                                                    ),
+                                                    overflow:
+                                                    TextOverflow
+                                                        .visible,
+                                                    maxLines: 1,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
-                                            Text(
-                                              state
-                                                  .visitorHistoryModel
-                                                  .data![index]
-                                                  .mobileNumber
-                                                  .toString(),
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow
-                                                  .visible,
-                                              maxLines: 2,
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.call,
+                                                  size: 16,
+                                                  color:
+                                                  Color(0xFF3629B7),
+                                                ),
+                                                Text(
+                                                  state
+                                                      .visitorHistoryModel
+                                                      .data![index]
+                                                      .mobileNumber
+                                                      .toString(),
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow: TextOverflow
+                                                      .visible,
+                                                  maxLines: 2,
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
+
                                       ],
                                     ),
+                                    if(selected == 'Other')
+                                    Row(
+                                      children: [
+                                        Text(
+                                         'Created by : ',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow
+                                              .visible,
+                                          maxLines: 2,
+                                        ),
+                                        Text(
+                                          state
+                                              .visitorHistoryModel
+                                              .data![index]
+                                              .createdBy
+                                              .toString(),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow
+                                              .visible,
+                                          maxLines: 2,
+                                        ),
+                                      ],
+                                    )
                                   ],
                                 ),
                               ),
