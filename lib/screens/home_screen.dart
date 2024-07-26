@@ -24,6 +24,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedDateFilter = 'This Month';
   String selected = 'Owner';
   String? _profilePic;
+  String? _userName;
+
 
   @override
   void initState() {
@@ -42,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _profilePic = prefs.getString('user_pic');
+      _userName = prefs.getString('user_name');
     });
   }
 
@@ -73,7 +76,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       SizedBox(width: 15),
                       Text(
-                        'Hi, user dashboard',
+                        'Hi, '+_userName!,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 19,
@@ -85,13 +88,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           SetNotificationfilter('all');
                         },
-                        child: Badge(
-                          label: Text(" "),
-                          child: Icon(
-                            Icons.notifications,
-                            color: Colors.white,
-                            size: width * 0.07,
-                          ),
+                        // child: Badge(
+                        //   label: Text("1"),
+                        //   child: Icon(
+                        //     Icons.notifications,
+                        //     color: Colors.white,
+                        //     size: width * 0.07,
+                        //   ),
+                        // ),
+                        child: Icon(
+                          Icons.notifications,
+                          color: Colors.white,
+                          size: width * 0.07,
                         ),
                       ),
                     ],

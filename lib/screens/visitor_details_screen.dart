@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guard_property_management/api_bloc/bloc/visitor_list_bloc/visitor_listing_bloc.dart';
 import 'package:guard_property_management/screens/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../api_bloc/bloc/visitor_details_bloc/visitor_details_bloc.dart';
 
@@ -25,6 +26,8 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
   String _selectedDateFilter = 'This Month';
   String selected = 'Owner';
   String? _profilePic;
+  String? _userName;
+
 
   @override
   void initState() {
@@ -41,9 +44,18 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _profilePic = prefs.getString('user_pic');
+      _userName = prefs.getString('user_name');
     });
   }
 
+  void _launchCaller(String mobileNumber) async {
+    final url = "tel:$mobileNumber";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +84,7 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                       ),
                       SizedBox(width: 15),
                       Text(
-                        'Hi, user dashboard',
+                        'Hi, '+_userName!,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 19,
@@ -84,13 +96,18 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                         onTap: () {
                           SetNotificationfilter('all');
                         },
-                        child: Badge(
-                          label: Text(" "),
-                          child: Icon(
-                            Icons.notifications,
-                            color: Colors.white,
-                            size: width * 0.07,
-                          ),
+                        // child: Badge(
+                        //   label: Text("1"),
+                        //   child: Icon(
+                        //     Icons.notifications,
+                        //     color: Colors.white,
+                        //     size: width * 0.07,
+                        //   ),
+                        // ),
+                        child: Icon(
+                          Icons.notifications,
+                          color: Colors.white,
+                          size: width * 0.07,
                         ),
                       ),
                     ],
@@ -158,25 +175,30 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                       children: [
                                         Padding(
                                           padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                                          child: Container(
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              children: [
-                                                Column(
-                                                  children: [
-                                                    Icon(Icons.call,  color: Color(0xFF3629B7),),
-                                                  ],
-                                                ),
-                                                SizedBox(width: 20,),
-                                                Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text('Owner Phone Number',
-                                                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.w700),),
-                                                    Text(state.visitorDetailsModel.data!.mobileNumber.toString(),style: TextStyle(fontSize: 12,fontWeight: FontWeight.w400),),
-                                                  ],
-                                                )
-                                              ],
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              _launchCaller(state.visitorDetailsModel.data!.mobileNumber.toString());
+                                            },
+                                            child: Container(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children: [
+                                                  Column(
+                                                    children: [
+                                                      Icon(Icons.call,  color: Color(0xFF3629B7),),
+                                                    ],
+                                                  ),
+                                                  SizedBox(width: 20,),
+                                                  Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      Text('Owner Phone Number',
+                                                        style: TextStyle(fontSize: 14,fontWeight: FontWeight.w700),),
+                                                      Text(state.visitorDetailsModel.data!.mobileNumber.toString(),style: TextStyle(fontSize: 12,fontWeight: FontWeight.w400),),
+                                                    ],
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -187,15 +209,15 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Center(
-                                                  child: Text(
-                                                    'Entry No #'+state.visitorDetailsModel.data!.visitId.toString(),
-                                                    style: TextStyle(
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 15.0,
-                                                    ),
-                                                  ),
-                                                ),
+                                                // Center(
+                                                //   child: Text(
+                                                //     'Entry No #'+state.visitorDetailsModel.data!.visitId.toString(),
+                                                //     style: TextStyle(
+                                                //       fontWeight: FontWeight.bold,
+                                                //       fontSize: 15.0,
+                                                //     ),
+                                                //   ),
+                                                // ),
                                                 SizedBox(height: 10.0),
                                                 Row(
                                                   children: [
@@ -242,7 +264,7 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      'Time',style: TextStyle(fontWeight: FontWeight.bold),
+                                                      'Visit Time',style: TextStyle(fontWeight: FontWeight.bold),
                                                     ),
                                                   ],
                                                 ),
@@ -282,7 +304,7 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      '--',
+                                                      state.visitorDetailsModel.data!.expiredTime.toString(),
                                                     ),
                                                   ],
                                                 ),
@@ -292,7 +314,7 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                                     Container(
                                                       width: MediaQuery.of(context).size.width/2.3,
                                                       child: Text(
-                                                        'NIRC/Password No:',style: TextStyle(fontWeight: FontWeight.bold),
+                                                        'NIRC/Passport No:',style: TextStyle(fontWeight: FontWeight.bold),
                                                       ),
                                                     ),
                                                     Text(

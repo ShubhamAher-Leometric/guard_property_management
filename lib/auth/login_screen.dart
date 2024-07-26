@@ -127,6 +127,7 @@ class _login_pageState extends State<login_page> {
                           SetLogin(state.loginModel.apiAccessToken!);
                           SetUserId(state.loginModel.data!.id.toString());
                           SetProfilePic(state.loginModel.data!.profileImage.toString());
+                          SetUserName(state.loginModel.data!.name.toString());
                           SetPropertyId(state.loginModel.data!.propertyId.toString());
                           Setdatefilter('this_month');
                           setSelectedTab('owner');
@@ -270,7 +271,13 @@ class _login_pageState extends State<login_page> {
       print('user_pic :' + profile_pic);
     });
   }
-
+  Future<void> SetUserName(String UserName) async {
+    final SharedPreferences prefs = await _prefs;
+    setState(() {
+      prefs.setString('user_name', UserName);
+      print('user_name :' + UserName);
+    });
+  }
   Future<void> Setdatefilter(String date_filter) async {
     final SharedPreferences prefs = await _prefs;
     setState(() {

@@ -1,7 +1,10 @@
 
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:guard_property_management/model/block.dart' as BlockModel;
+import 'package:guard_property_management/model/property.dart' as PropertyModel;
+import 'package:guard_property_management/model/floor.dart' as FloorModel;
+import 'package:guard_property_management/model/unit.dart' as UnitModel;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -9,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../api_bloc/api_service.dart';
 import '../constant.dart';
 
 class AddNewVisitor extends StatefulWidget {
@@ -35,12 +39,27 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
   final TextEditingController _entryController = TextEditingController();
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _remarkController = TextEditingController();
+  TextEditingController _blockController = TextEditingController();
+  TextEditingController _floorController = TextEditingController();
+  TextEditingController _unitNumberController = TextEditingController();
 
   bool isSecondContainerVisible = false;
   bool isThirdContainerVisible = false;
   bool isFourthContainerVisible = false;
   bool isFifthContainerVisible = false;
   bool isSixthContainerVisible = false;
+  bool isSeventhContainerVisible = false;
+  bool isEightthContainerVisible = false;
+  bool isNinethContainerVisible = false;
+
+
+  late List<BlockModel.Data?> blockList = [];
+  late List<FloorModel.Data> floorList = [];
+  late List<UnitModel.Data> unitList = [];
+
+  int? blockId;
+  int? floorId;
+  int? unitId;
 
   File? _image;
   final ImagePicker _picker = ImagePicker();
@@ -54,12 +73,59 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
   void initState() {
     super.initState();
     _initPrefs();
+    fetchBlockList();
+  }
+
+  void fetchBlockList() async {
+    final prefs = await SharedPreferences.getInstance();
+    var property_id =await prefs.getString('Guard_property_id');
+    final response = await http.get(
+        Uri.parse('${AuthService()
+            .baseUrl}/api/get-property-blocks?property_id=$property_id'));
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      BlockModel.Block block = BlockModel.Block.fromJson(jsonData);
+      setState(() {
+        blockList = block.data;
+      });
+    } else {
+      throw Exception('Failed to load block list');
+    }
+  }
+
+  void fetchFloorList(int blockId) async {
+    final response =
+    await http.get(
+        Uri.parse('${AuthService().baseUrl}/api/get-floors?block_id=$blockId'));
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      FloorModel.Floor floor = FloorModel.Floor.fromJson(jsonData);
+      setState(() {
+        floorList = floor.data;
+      });
+    } else {
+      throw Exception('Failed to load floor list');
+    }
+  }
+
+  void fetchUnitList(int floorId) async {
+    final response =
+    await http.get(
+        Uri.parse('${AuthService().baseUrl}/api/get-units-for-guard?floor_id=$floorId'));
+    if (response.statusCode == 200) {
+      final jsonData = jsonDecode(response.body);
+      UnitModel.Unit unit = UnitModel.Unit.fromJson(jsonData);
+      setState(() {
+        unitList = unit.data;
+      });
+    } else {
+      throw Exception('Failed to load unit list');
+    }
   }
 
   Future<void> _initPrefs() async {
     prefs = await SharedPreferences.getInstance();
   }
-
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(
       source: source,
@@ -182,10 +248,10 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
     request.headers['Authorization'] =
     "Bearer ${prefs.getString('TOKEN')}";
 
-    request.fields['property_id'] = prefs.getString('Facility_Property_Id')!;
-    request.fields['block_id'] = prefs.getString('Facility_Block_Id')!;
-    request.fields['floor_id'] = prefs.getString('Facility_Floor_Id')!;
-    request.fields['unit_id'] =prefs.getString('Facility_Unit_Id')!;
+    request.fields['property_id'] = prefs.getString('Guard_property_id')!;
+    request.fields['block_id'] =  blockId!.toString();
+    request.fields['floor_id'] = floorId!.toString();
+    request.fields['unit_id'] = unitId!.toString();
     request.fields['purpose_of_visit'] = _purposeController.text;
     request.fields['name'] = _fullAddressController.text;
     request.fields['mob_number'] = _phoneNumberController.text;
@@ -198,7 +264,7 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
     request.fields['vehicle_number'] = _vehicleController.text;
     request.fields['remark'] = _remarkController.text;
     request.fields['expired_time'] = _expirytimeController.text;
-    request.fields['added_by'] = 'owner';
+    request.fields['added_by'] = 'guard';
 
 
     if (_image != null) {
@@ -652,7 +718,6 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                   ),
                 ),
               ),
-              const SizedBox(height: 10.0),
 
               const  SizedBox(height: 16),
 
@@ -831,6 +896,298 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                     child: Image.file(_image!),
                   ),
                 ),
+              const SizedBox(height: 16),
+              Text(
+                'Block',
+                style: TextStyle(fontSize: 18.0),
+              ),
+              Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(
+                    color: Colors.black,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isSeventhContainerVisible = !isSeventhContainerVisible;
+                          });
+                        },
+                        child: AbsorbPointer(
+                          absorbing: true,
+                          child: TextField(
+                            controller: _blockController,
+                            decoration: InputDecoration(
+                              hintText: 'Select block name',
+                              contentPadding: EdgeInsets.all(12.0),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isSeventhContainerVisible = !isSeventhContainerVisible;
+                        });
+                      },
+                      icon: Icon(Icons.arrow_drop_down),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 5.0),
+              Visibility(
+                visible: isSeventhContainerVisible,
+                child: SizedBox(
+                  // width: 347.0,
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 0.1,
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: blockList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _blockController.text =
+                                          blockList[index]?.name ?? '';
+                                      isSeventhContainerVisible = false;
+                                      blockId = blockList[index]?.blockId;
+                                      fetchFloorList(
+                                          blockList[index]?.blockId ?? 0);
+                                    });
+                                  },
+                                  child: Text(
+                                    blockList[index]?.name ?? '',
+                                    style: TextStyle(fontSize: 14.0),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 5.0),
+              Text(
+                'Floor',
+                style: TextStyle(fontSize: 18.0),
+              ),
+              Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(
+                    color: Colors.black,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isEightthContainerVisible =
+                            !isEightthContainerVisible;
+                          });
+                        },
+                        child: AbsorbPointer(
+                          absorbing: true,
+                          child: TextField(
+                            controller: _floorController,
+                            decoration: InputDecoration(
+                              hintText: 'Select floor',
+                              contentPadding: EdgeInsets.all(12.0),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isEightthContainerVisible = !isEightthContainerVisible;
+                        });
+                      },
+                      icon: Icon(Icons.arrow_drop_down),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 5.0),
+              Visibility(
+                visible: isEightthContainerVisible,
+                child: SizedBox(
+                  // width: 347.0,
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 0.1,
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: floorList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _floorController.text =
+                                          floorList[index].name;
+                                      isEightthContainerVisible = false;
+                                      floorId = floorList[index].floorId;
+                                      fetchUnitList(floorList[index].floorId);
+                                    });
+                                  },
+                                  child: Text(
+                                    floorList[index].name,
+                                    style: TextStyle(fontSize: 14.0),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(height: 20.0),
+              Text(
+                'Unit Number',
+                style: TextStyle(fontSize: 18.0),
+              ),
+              Container(
+                height: 60,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(
+                    color: Colors.black,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isNinethContainerVisible = !isNinethContainerVisible;
+                          });
+                        },
+                        child: AbsorbPointer(
+                          absorbing: true,
+                          child: TextField(
+                            controller: _unitNumberController,
+                            decoration: InputDecoration(
+                              hintText: 'Select unit number',
+                              contentPadding: EdgeInsets.all(12.0),
+                              border: InputBorder.none,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          isNinethContainerVisible = !isNinethContainerVisible;
+                        });
+                      },
+                      icon: Icon(Icons.arrow_drop_down),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 5.0),
+              Visibility(
+                visible: isNinethContainerVisible,
+                child: SizedBox(
+                  // width: 347.0,
+                  child: Center(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey,
+                            blurRadius: 0.1,
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: unitList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _unitNumberController.text =
+                                          unitList[index].name;
+                                      unitId = unitList[index].unitId;
+                                      isNinethContainerVisible = false;
+                                    });
+                                  },
+                                  child: Text(
+                                    unitList[index].name,
+                                    style: TextStyle(fontSize: 14.0),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
              const SizedBox(height: 16),
               const Text(
                 'Vehicle Number',
