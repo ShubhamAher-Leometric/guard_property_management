@@ -14,12 +14,13 @@ class VisitorRequestApiProvider {
     if (isInternet) {
       final prefs = await SharedPreferences.getInstance();
       var token = await prefs.getString('TOKEN');
+      var user_id = await prefs.getString('Login_user_id');
       var property_id =await prefs.getString('Guard_property_id');
       var selected_tab =await prefs.getString('selected_tab');
       var visitor_filtor =await prefs.getString('visitor_filter');
 
       print("Visitor list Request");
-      final String _url = '${AppConstants.BASE_URL}/api/get-property-visitors-listing-by-guard?request_type=$selected_tab&property_id=$property_id&date_filter=$visitor_filtor';
+      final String _url = '${AppConstants.BASE_URL}/api/get-property-visitors-listing-by-guard?request_type=$selected_tab&property_id=$property_id&date_filter=$visitor_filtor&guard_id=$user_id';
 
       Response response = await _dio.get(
         _url,

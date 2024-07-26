@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guard_property_management/api_bloc/bloc/visitor_list_bloc/visitor_listing_bloc.dart';
+import 'package:guard_property_management/screens/history_page.dart';
 import 'package:guard_property_management/screens/new_visitor.dart';
 import 'package:guard_property_management/screens/settings_screen.dart';
 import 'package:guard_property_management/screens/visitor_details_screen.dart';
@@ -117,12 +118,35 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     child: Column(
                       children: [
-                        SizedBox(height: 10),
-                        Text(
-                          'Visitor Request',
-                          style: TextStyle(fontSize: 18),
+                        SizedBox(height: 15),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'Visitor Request',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                              Spacer(),
+                              GestureDetector(
+                                onTap: (){
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            HistoryPage()),
+                                  );
+                                },
+                                child: Text(
+                                  'History',
+                                  style: TextStyle(fontSize: 18,color: Colors.blue),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        SizedBox(height: 10),
+                        Divider(),
+                        // SizedBox(height: 10),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -149,8 +173,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Container(
                                   height: 2,
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      40,
+                                  width: MediaQuery.of(context).size.width / 3 -
+                                      20,
                                   color: selected == 'Owner'
                                       ? Color(0xFF3629B7)
                                       : Colors.grey,
@@ -158,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                             SizedBox(
-                              width: 20,
+                              width: 10,
                             ),
                             Column(
                               children: [
@@ -183,9 +207,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                                 Container(
                                   height: 2,
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      40,
+                                  width: MediaQuery.of(context).size.width / 3 -
+                                      20,
                                   color: selected == 'Me'
+                                      ? Color(0xFF3629B7)
+                                      : Colors.grey,
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Column(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selected = 'Other';
+                                    });
+                                    setSelectedTab('other');
+                                    _initVisitorList();
+                                  },
+                                  child: Text(
+                                    'Other',
+                                    style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w500,
+                                      color: selected == 'Other'
+                                          ? Color(0xFF3629B7)
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  height: 2,
+                                  width: MediaQuery.of(context).size.width / 3 -
+                                      20,
+                                  color: selected == 'Other'
                                       ? Color(0xFF3629B7)
                                       : Colors.grey,
                                 ),
