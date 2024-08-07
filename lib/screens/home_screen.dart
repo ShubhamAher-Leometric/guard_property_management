@@ -8,6 +8,9 @@ import 'package:guard_property_management/screens/settings_screen.dart';
 import 'package:guard_property_management/screens/visitor_details_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../api_bloc/bloc/notification_count_bloc/notification_count_bloc.dart';
+import 'notification.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -18,6 +21,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   VisitorListingBloc _visitorListingBloc = VisitorListingBloc();
+  late NotificationCountBloc _notificationCountBloc = NotificationCountBloc();
+
 
   late SharedPreferences prefs;
   int _selectedIndex = 0;
@@ -35,6 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setSelectedTab('owner');
     _loadProfilePic();
     _initVisitorList();
+    _notificationCountBloc.add(GetNotificationCountEvent());
   }
 
   Future<void> _initVisitorList() async {
@@ -85,22 +91,73 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       Spacer(),
-                      GestureDetector(
-                        onTap: () {
-                          SetNotificationfilter('all');
-                        },
-                        // child: Badge(
-                        //   label: Text("1"),
-                        //   child: Icon(
-                        //     Icons.notifications,
-                        //     color: Colors.white,
-                        //     size: width * 0.07,
-                        //   ),
-                        // ),
-                        child: Icon(
-                          Icons.notifications,
-                          color: Colors.white,
-                          size: width * 0.07,
+                      BlocProvider(
+                        create: (context) => _notificationCountBloc,
+                        child: BlocBuilder<NotificationCountBloc,
+                            NotificationCountState>(
+                          builder: (context, state) {
+                            if (state is NotificationCountLoading) {
+                              return GestureDetector(
+                                onTap: () {
+                                  SetNotificationfilter('all');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => NotificationList()),
+                                  );
+                                },
+                                child: Badge(
+                                  label: Text(" "),
+                                  child: Icon(
+                                    Icons.notifications,
+                                    color: Colors.white,
+                                    size: width * 0.07,
+                                  ),
+                                ),
+                              );
+                            } else if (state is NotificationCountLoaded) {
+                              return GestureDetector(
+                                onTap: () {
+                                  SetNotificationfilter('all');
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => NotificationList()),
+                                  ).then((_) {
+                                    _notificationCountBloc
+                                        .add(GetNotificationCountEvent());
+                                  });
+                                },
+                                child: Badge(
+                                  label: Text(
+                                      state.notificationCountModel.data.toString()),
+                                  child: Icon(
+                                    Icons.notifications,
+                                    color: Colors.white,
+                                    size: width * 0.07,
+                                  ),
+                                ),
+                              );
+                            }
+                            return GestureDetector(
+                              onTap: () {
+                                SetNotificationfilter('all');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => NotificationList()),
+                                );
+                              },
+                              child: Badge(
+                                label: Text(" "),
+                                child: Icon(
+                                  Icons.notifications,
+                                  color: Colors.white,
+                                  size: width * 0.07,
+                                ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -116,328 +173,273 @@ class _HomeScreenState extends State<HomeScreen> {
                         topRight: Radius.circular(30),
                       ),
                     ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 15),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                'Visitor Request',
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              Spacer(),
-                              GestureDetector(
-                                onTap: (){
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            HistoryPage()),
-                                  );
-                                },
-                                child: Text(
-                                  'History',
-                                  style: TextStyle(fontSize: 18,color: Colors.blue),
+                    child: RefreshIndicator(
+                      onRefresh: () async{
+                        _initVisitorList();
+                        _notificationCountBloc.add(GetNotificationCountEvent());
+                      },
+                      child: Column(
+                        children: [
+                          SizedBox(height: 15),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  'Visitor Request',
+                                  style: TextStyle(fontSize: 18),
                                 ),
+                                Spacer(),
+                                GestureDetector(
+                                  onTap: (){
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              HistoryPage()),
+                                    );
+                                  },
+                                  child: Text(
+                                    'History',
+                                    style: TextStyle(fontSize: 18,color: Colors.blue),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Divider(),
+                          // SizedBox(height: 10),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selected = 'Owner';
+                                      });
+                                      setSelectedTab('owner');
+                                      _initVisitorList();
+                                    },
+                                    child: Text(
+                                      'Owner',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: selected == 'Owner'
+                                            ? Color(0xFF3629B7)
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 2,
+                                    width: MediaQuery.of(context).size.width / 3 -
+                                        20,
+                                    color: selected == 'Owner'
+                                        ? Color(0xFF3629B7)
+                                        : Colors.grey,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selected = 'Me';
+                                      });
+                                      setSelectedTab('guard');
+                                      _initVisitorList();
+                                    },
+                                    child: Text(
+                                      'Me',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: selected == 'Me'
+                                            ? Color(0xFF3629B7)
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 2,
+                                    width: MediaQuery.of(context).size.width / 3 -
+                                        20,
+                                    color: selected == 'Me'
+                                        ? Color(0xFF3629B7)
+                                        : Colors.grey,
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Column(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        selected = 'Other';
+                                      });
+                                      setSelectedTab('other');
+                                      _initVisitorList();
+                                    },
+                                    child: Text(
+                                      'Other',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500,
+                                        color: selected == 'Other'
+                                            ? Color(0xFF3629B7)
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 2,
+                                    width: MediaQuery.of(context).size.width / 3 -
+                                        20,
+                                    color: selected == 'Other'
+                                        ? Color(0xFF3629B7)
+                                        : Colors.grey,
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                        ),
-                        Divider(),
-                        // SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Column(
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10.0, horizontal: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selected = 'Owner';
-                                    });
-                                    setSelectedTab('owner');
-                                    _initVisitorList();
-                                  },
-                                  child: Text(
-                                    'Owner',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: selected == 'Owner'
-                                          ? Color(0xFF3629B7)
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 2,
-                                  width: MediaQuery.of(context).size.width / 3 -
-                                      20,
-                                  color: selected == 'Owner'
-                                      ? Color(0xFF3629B7)
-                                      : Colors.grey,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selected = 'Me';
-                                    });
-                                    setSelectedTab('guard');
-                                    _initVisitorList();
-                                  },
-                                  child: Text(
-                                    'Me',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: selected == 'Me'
-                                          ? Color(0xFF3629B7)
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 2,
-                                  width: MediaQuery.of(context).size.width / 3 -
-                                      20,
-                                  color: selected == 'Me'
-                                      ? Color(0xFF3629B7)
-                                      : Colors.grey,
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selected = 'Other';
-                                    });
-                                    setSelectedTab('other');
-                                    _initVisitorList();
-                                  },
-                                  child: Text(
-                                    'Other',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500,
-                                      color: selected == 'Other'
-                                          ? Color(0xFF3629B7)
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  height: 2,
-                                  width: MediaQuery.of(context).size.width / 3 -
-                                      20,
-                                  color: selected == 'Other'
-                                      ? Color(0xFF3629B7)
-                                      : Colors.grey,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10.0, horizontal: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              GestureDetector(
-                                onTap: _showDateFilterPopup,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[200],
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        _selectedDateFilter,
-                                        style: TextStyle(
-                                            fontSize: 16, color: Colors.grey),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Icon(Icons.keyboard_arrow_down,
-                                          color: Colors.grey),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        BlocProvider(
-                          create: (context) => _visitorListingBloc,
-                          child: BlocBuilder<VisitorListingBloc,
-                              VisitorListingState>(
-                            builder: (context, state) {
-                              if (state is VisitorListingLoading) {
-                                return Expanded(
-                                    child: Center(
+                                  onTap: _showDateFilterPopup,
                                   child: Container(
-                                    height: 30,
-                                    width: 30,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.grey,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 5),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          _selectedDateFilter,
+                                          style: TextStyle(
+                                              fontSize: 16, color: Colors.grey),
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Icon(Icons.keyboard_arrow_down,
+                                            color: Colors.grey),
+                                      ],
                                     ),
                                   ),
-                                ));
-                              } else if (state is VisitorListingLoaded) {
-                                return Expanded(
-                                  child: ListView.builder(
-                                    padding: EdgeInsets.zero,
-                                    itemCount:
-                                        state.vistorListingModel.data!.length,
-                                    itemBuilder: (context, index) {
-                                      return GestureDetector(
-                                        onTap: () {
-                                          SetVisitordetials(state
-                                              .vistorListingModel
-                                              .data![index]
-                                              .visitId
-                                              .toString());
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    VisitorDetailsScreen()),
-                                          );
-                                        },
-                                        child: Container(
-                                          height: 86,
-                                          margin: EdgeInsets.only(
-                                              left: 10, right: 10, bottom: 8),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.grey
-                                                    .withOpacity(0.2),
-                                                spreadRadius: 2,
-                                                blurRadius: 5,
-                                                offset: Offset(0, 3),
-                                              ),
-                                            ],
-                                          ),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 10),
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Container(
-                                                      width: MediaQuery.of(context)
-                                                              .size
-                                                              .width /
-                                                          2.2,
-                                                      child: Column(
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                            state.vistorListingModel
-                                                                .data![index].name
-                                                                .toString(),
-                                                            style: TextStyle(
-                                                              fontSize: 16,
-                                                              color: Colors.black,
-                                                            ),
-                                                            overflow: TextOverflow
-                                                                .visible,
-                                                            maxLines: 2,
-                                                          ),
-                                                          Text(
-                                                            state
-                                                                .vistorListingModel
-                                                                .data![index]
-                                                                .unitInfo
-                                                                .toString(),
-                                                            style: TextStyle(
-                                                              fontSize: 16,
-                                                              color: Colors.black,
-                                                            ),
-                                                            overflow: TextOverflow
-                                                                .visible,
-                                                            maxLines: 2,
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment.start,
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.center,
-                                                      children: [
-                                                        Row(
+                                ),
+                              ],
+                            ),
+                          ),
+                          BlocProvider(
+                            create: (context) => _visitorListingBloc,
+                            child: BlocBuilder<VisitorListingBloc,
+                                VisitorListingState>(
+                              builder: (context, state) {
+                                if (state is VisitorListingLoading) {
+                                  return Expanded(
+                                      child: Center(
+                                    child: Container(
+                                      height: 30,
+                                      width: 30,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ));
+                                } else if (state is VisitorListingLoaded) {
+                                  return Expanded(
+                                    child: ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      itemCount:
+                                          state.vistorListingModel.data!.length,
+                                      itemBuilder: (context, index) {
+                                        return GestureDetector(
+                                          onTap: () {
+                                            SetVisitordetials(state
+                                                .vistorListingModel
+                                                .data![index]
+                                                .visitId
+                                                .toString());
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      VisitorDetailsScreen()),
+                                            );
+                                          },
+                                          child: Container(
+                                            height: 86,
+                                            margin: EdgeInsets.only(
+                                                left: 10, right: 10, bottom: 8),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(15),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(0.2),
+                                                  spreadRadius: 2,
+                                                  blurRadius: 5,
+                                                  offset: Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 10),
+                                              child: Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Container(
+                                                        width: MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            2.2,
+                                                        child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .start,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
                                                           children: [
-                                                            Icon(
-                                                              Icons.calendar_month,
-                                                              size: 16,
-                                                              color:
-                                                                  Color(0xFF3629B7),
-                                                            ),
-                                                            Container(
-                                                              width: 100,
-                                                              child: Text(
-                                                                state
-                                                                    .vistorListingModel
-                                                                    .data![index]
-                                                                    .visitDate
-                                                                    .toString(),
-                                                                style: TextStyle(
-                                                                  fontSize: 16,
-                                                                  color:
-                                                                      Colors.black,
-                                                                ),
-                                                                overflow:
-                                                                    TextOverflow
-                                                                        .visible,
-                                                                maxLines: 1,
+                                                            Text(
+                                                              state.vistorListingModel
+                                                                  .data![index].name
+                                                                  .toString(),
+                                                              style: TextStyle(
+                                                                fontSize: 16,
+                                                                color: Colors.black,
                                                               ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Icon(
-                                                              Icons.call,
-                                                              size: 16,
-                                                              color:
-                                                                  Color(0xFF3629B7),
+                                                              overflow: TextOverflow
+                                                                  .visible,
+                                                              maxLines: 2,
                                                             ),
                                                             Text(
                                                               state
                                                                   .vistorListingModel
                                                                   .data![index]
-                                                                  .mobileNumber
+                                                                  .unitInfo
                                                                   .toString(),
                                                               style: TextStyle(
                                                                 fontSize: 16,
@@ -449,76 +451,137 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             ),
                                                           ],
                                                         ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                                if(selected == 'Other')
-                                                  Row(
-                                                    children: [
-                                                      Text(
-                                                        'Created by : ',
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.black,
-                                                        ),
-                                                        overflow: TextOverflow
-                                                            .visible,
-                                                        maxLines: 2,
                                                       ),
-                                                      Text(
-                                                        state
-                                                            .vistorListingModel
-                                                            .data![index]
-                                                            .createdBy
-                                                            .toString(),
-                                                        style: TextStyle(
-                                                          fontSize: 16,
-                                                          color: Colors.black,
-                                                        ),
-                                                        overflow: TextOverflow
-                                                            .visible,
-                                                        maxLines: 2,
+                                                      Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment.start,
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment.center,
+                                                        children: [
+                                                          Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.calendar_month,
+                                                                size: 16,
+                                                                color:
+                                                                    Color(0xFF3629B7),
+                                                              ),
+                                                              Container(
+                                                                width: 100,
+                                                                child: Text(
+                                                                  state
+                                                                      .vistorListingModel
+                                                                      .data![index]
+                                                                      .visitDate
+                                                                      .toString(),
+                                                                  style: TextStyle(
+                                                                    fontSize: 16,
+                                                                    color:
+                                                                        Colors.black,
+                                                                  ),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .visible,
+                                                                  maxLines: 1,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          Row(
+                                                            children: [
+                                                              Icon(
+                                                                Icons.call,
+                                                                size: 16,
+                                                                color:
+                                                                    Color(0xFF3629B7),
+                                                              ),
+                                                              Text(
+                                                                state
+                                                                    .vistorListingModel
+                                                                    .data![index]
+                                                                    .mobileNumber
+                                                                    .toString(),
+                                                                style: TextStyle(
+                                                                  fontSize: 16,
+                                                                  color: Colors.black,
+                                                                ),
+                                                                overflow: TextOverflow
+                                                                    .visible,
+                                                                maxLines: 2,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
-                                                  )
-                                              ],
+                                                  ),
+                                                  if(selected == 'Other')
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          'Created by : ',
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .visible,
+                                                          maxLines: 2,
+                                                        ),
+                                                        Text(
+                                                          state
+                                                              .vistorListingModel
+                                                              .data![index]
+                                                              .createdBy
+                                                              .toString(),
+                                                          style: TextStyle(
+                                                            fontSize: 16,
+                                                            color: Colors.black,
+                                                          ),
+                                                          overflow: TextOverflow
+                                                              .visible,
+                                                          maxLines: 2,
+                                                        ),
+                                                      ],
+                                                    )
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                );
-                              } else if (state is VisitorListingError) {
+                                        );
+                                      },
+                                    ),
+                                  );
+                                } else if (state is VisitorListingError) {
+                                  return Expanded(child: Container());
+                                }
                                 return Expanded(child: Container());
-                              }
-                              return Expanded(child: Container());
-                            },
-                          ),
-                        ),
-                        if (selected == 'Me')
-                          ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => AddNewVisitor()),
-                              );
-                            },
-                            icon: Icon(Icons.add),
-                            label: Text('Add Visitor'),
-                            style: ElevatedButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Color(0xFF3629B7),
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
+                              },
                             ),
                           ),
-                      ],
+                          if (selected == 'Me')
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => AddNewVisitor()),
+                                );
+                              },
+                              icon: Icon(Icons.add),
+                              label: Text('Add Visitor'),
+                              style: ElevatedButton.styleFrom(
+                                foregroundColor: Colors.white,
+                                backgroundColor: Color(0xFF3629B7),
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 30, vertical: 15),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(25),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                     // child: DefaultTabController(
                     //   length: 2,
