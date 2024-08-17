@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:guard_property_management/screens/visitor_details_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api_bloc/bloc/notification_list_bloc/notification_list_bloc.dart';
 import '../api_bloc/bloc/read_delete_notification_bloc/read_delete_notification_bloc.dart';
@@ -210,59 +211,29 @@ class _NotificationListState extends State<NotificationList> {
                                   },
                                 );
                               },
-                              // onDismissed: (direction) {
-                              //   var sendreadData = {
-                              //         "notification_ids": [state.notificationListModel.data![index].id as int],
-                              //         "status": 'delete',
-                              //   };
-                              //   var readNotificationData = jsonEncode(sendreadData);
-                              //   _readDeleteNotificationBloc.add(SubmitReadDeleteNotificationData(readNotificationData));
-                              //   },
+                              onDismissed: (direction) {
+                                var sendreadData = {
+                                      "notification_ids": [state.notificationListModel.data![index].id as int],
+                                      "status": 'delete',
+                                };
+                                var readNotificationData = jsonEncode(sendreadData);
+                                _readDeleteNotificationBloc.add(SubmitReadDeleteNotificationData(readNotificationData));
+                                },
                               child: GestureDetector(
-                                // onTap: () {
-                                //   if(state.notificationListModel.data![index].notificationType=='noticeboard')
-                                //     {
-                                //       SetNoticeboardPropertyID(state.notificationListModel.data![index].additionalData!.propertyId.toString());
-                                //       SetNoticeboarddatefilter('this_month');
-                                //       Navigator.push(
-                                //         context,
-                                //         MaterialPageRoute(builder: (context) => Notice_Board()),
-                                //       );
-                                //     }else if(state.notificationListModel.data![index].notificationType=='bill_generation'){
-                                //     SetPropertyIds(
-                                //       state.notificationListModel.data![index].additionalData!.propertyId as int,
-                                //       state.notificationListModel.data![index].additionalData!.unitId as int,
-                                //     );
-                                //     SetBillingStatus('all');
-                                //     Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(builder: (context) => BillingPage()),
-                                //     );
-                                //   }else if(state.notificationListModel.data![index].notificationType=='defect_reply'){
-                                //     SetDefectID(state.notificationListModel.data![index].additionalData!.defectId as int);
-                                //     Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(builder: (context) => DefectSecondPage()),
-                                //     );
-                                //   }else if(state.notificationListModel.data![index].notificationType=='visitor'){
-                                //     SetVisitortype('upcoming');
-                                //     SetvisitorPropertyIds(    state
-                                //         .notificationListModel
-                                //         .data![index]
-                                //         .additionalData!.blockId as int,state
-                                //         .notificationListModel
-                                //         .data![index]
-                                //         .additionalData!.floorId as int,
-                                //         state
-                                //             .notificationListModel
-                                //             .data![index]
-                                //             .additionalData!.unitId as int);
-                                //     Navigator.push(
-                                //       context,
-                                //       MaterialPageRoute(builder: (context) => MyHomePage()),
-                                //     );
-                                //   }
-                                // },
+                                onTap: () {
+                                  if(state.notificationListModel.data![index].notificationType=='visitor')
+                                    {
+                                    SetVisitordetials(state
+                                        .notificationListModel
+                                        .data![index]
+                                        .additionalData!.visitId
+                                        .toString());
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => VisitorDetailsScreen()),
+                                      );
+                                    }
+                                  },
                                 child: Container(
                                   margin: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
                                   decoration: BoxDecoration(
@@ -350,6 +321,7 @@ class _NotificationListState extends State<NotificationList> {
       ),
     );
   }
+
   Future<void> SetDefectID(int defctID, ) async {
     final SharedPreferences prefs = await _prefs;
     setState(() {
@@ -357,6 +329,13 @@ class _NotificationListState extends State<NotificationList> {
       print('Defect_Id :-----' + defctID.toString());
     });
   }
+  Future<void> SetVisitordetials(String visitor_id) async {
+    final SharedPreferences prefs = await _prefs;
+        setState(() {
+           prefs.setString('visitor_id', visitor_id);
+           print('visitor_id :' + visitor_id);
+         });
+     }
   Future<void> SetBillingStatus(String billingstatus) async {
     final SharedPreferences prefs = await _prefs;
     setState(() {

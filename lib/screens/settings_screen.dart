@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// import 'package:property_management/privacy.dart';
-// import 'package:property_management/profile.dart';
-// import 'package:property_management/term_condition.dart';
-// import 'package:property_management/users_screen/Login_Page.dart';
+import 'package:guard_property_management/screens/privacy.dart';
+import 'package:guard_property_management/screens/term_condition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../auth/login_screen.dart';
+import 'Profile_screen.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -62,30 +60,30 @@ class _SettingsState extends State<Settings> {
             children: <Widget>[
               ListTile(
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => Profile()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Profile()),
+                  );
                 },
                 title: const Text('Edit Profile', style: TextStyle(fontSize: 17)),
                 trailing: const Icon(Icons.arrow_right),
               ),
               ListTile(
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => const TermCondition()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) =>  TermCondition()),
+                  );
                 },
                 title: const Text('Terms & Conditions', style: TextStyle(fontSize: 17)),
                 trailing: const Icon(Icons.arrow_right), // Use appropriate icon
               ),
               ListTile(
                 onTap: () {
-                  // Navigator.push(
-                  //   context,
-                  //   MaterialPageRoute(builder: (context) => PrivacyPolicy()),
-                  // );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => PrivacyPolicy()),
+                  );
                 },
                 title: const Text('Privacy Policy', style: TextStyle(fontSize: 17)),
                 trailing: const Icon(Icons.arrow_right),

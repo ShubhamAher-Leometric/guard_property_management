@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guard_property_management/api_bloc/bloc/visitor_list_bloc/visitor_listing_bloc.dart';
 import 'package:guard_property_management/screens/settings_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../api_bloc/bloc/get_profile_bloc/get_profile_bloc.dart';
 import '../api_bloc/bloc/visitor_details_bloc/visitor_details_bloc.dart';
 
 class VisitorDetailsScreen extends StatefulWidget {
@@ -18,7 +18,7 @@ class VisitorDetailsScreen extends StatefulWidget {
 class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   VisitorDetailsBloc _visitorDetailsBloc = VisitorDetailsBloc();
-
+  late GetProfileBloc _getProfileBloc = GetProfileBloc();
 
   late SharedPreferences prefs;
   int _selectedIndex = 0;
@@ -34,6 +34,8 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
     super.initState();
     _loadProfilePic();
     _initVisitorList();
+    _getProfileBloc.add(GetProfileDataEvent());
+
   }
 
   Future<void> _initVisitorList() async {
@@ -75,20 +77,72 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                   padding: EdgeInsets.all(20),
                   child: Row(
                     children: <Widget>[
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.white,
-                        backgroundImage: _profilePic != null
-                            ? NetworkImage(_profilePic!)
-                            : AssetImage('assets/Home.png'),
-                      ),
-                      SizedBox(width: 15),
-                      Text(
-                        'Hi, '+_userName!,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
+                      BlocProvider(
+                        create: (context) => _getProfileBloc,
+                        child: BlocBuilder<GetProfileBloc, GetProfileState>(
+                          builder: (context, state) {
+                            if (state is GetProfileLoading) {
+                              return Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: AssetImage('assets/images/dummy_user.jpeg'),
+                                  ),
+                                  SizedBox(width: 15),
+                                  Text(
+                                    'Hi,',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else if (state is GetProfileLoaded) {
+                              return Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: NetworkImage(state
+                                        .getProfileModel.data!.profileImage
+                                        .toString()),
+                                  ),
+                                  SizedBox(width: 15),
+                                  Text(
+                                    'Hi, ' +
+                                        state.getProfileModel.data!.name
+                                            .toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                            return Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: AssetImage('assets/images/dummy_user.jpeg'),
+                                ),
+                                SizedBox(width: 15),
+                                Text(
+                                  'Hi, user dashboard',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                       Spacer(),
@@ -146,7 +200,7 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                     },
                                   ),
                                   Text(
-                                    'Visitors Facility',
+                                    'Visitors Details',
                                     style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 18,
@@ -330,6 +384,7 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                                         state.visitorDetailsModel.data!.nricPassportNo.toString(),
                                                       ),
                                                     ),
+                                                    if(state.visitorDetailsModel.data!.idImage.toString()!='N/A')
                                                     GestureDetector(
                                                       onTap: () {
                                                         showDialog(

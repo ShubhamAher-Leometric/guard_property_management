@@ -6,6 +6,7 @@ class NotificationListModel {
   NotificationListModel.withError(String errorMessage) {
     error = errorMessage;
   }
+
   NotificationListModel({this.status, this.data});
 
   NotificationListModel.fromJson(Map<String, dynamic> json) {
@@ -70,50 +71,42 @@ class Data {
 }
 
 class AdditionalData {
-  int? defectId;
-  int? propertyId;
   String? visitorName;
   String? requestType;
+  int? visitId;
   int? blockId;
   int? floorId;
   int? unitId;
   String? visitTime;
-  int? userId;
 
   AdditionalData(
-      {this.defectId,
-        this.propertyId,
-        this.visitorName,
+      {this.visitorName,
         this.requestType,
+        this.visitId,
         this.blockId,
         this.floorId,
         this.unitId,
-        this.visitTime,
-        this.userId});
+        this.visitTime});
 
   AdditionalData.fromJson(Map<String, dynamic> json) {
-    defectId = json['defect_id'];
-    propertyId = json['property_id'];
     visitorName = json['visitor_name'];
     requestType = json['request_type'];
+    visitId = json['visit_id'];
     blockId = json['block_id'];
     floorId = json['floor_id'];
     unitId = json['unit_id'];
     visitTime = json['visit_time'];
-    userId = json['user_id'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['defect_id'] = this.defectId;
-    data['property_id'] = this.propertyId;
     data['visitor_name'] = this.visitorName;
     data['request_type'] = this.requestType;
+    data['visit_id'] = this.visitId;
     data['block_id'] = this.blockId;
     data['floor_id'] = this.floorId;
     data['unit_id'] = this.unitId;
     data['visit_time'] = this.visitTime;
-    data['user_id'] = this.userId;
     return data;
   }
 }

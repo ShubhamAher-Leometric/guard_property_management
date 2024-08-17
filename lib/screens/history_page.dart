@@ -65,7 +65,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         _initVisitorList();
                       },
                       child: Text(
-                        'Owner',
+                        'Invite by owner',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
@@ -77,18 +77,14 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                     Container(
                       height: 2,
-                      width: MediaQuery.of(context).size.width / 3 -
-                          20,
+                      width: MediaQuery.of(context).size.width / 2-20,
                       color: selected == 'Owner'
                           ? Color(0xFF3629B7)
                           : Colors.grey,
                     ),
                   ],
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Column(
+SizedBox(width: 10,),                Column(
                   children: [
                     GestureDetector(
                       onTap: () {
@@ -99,7 +95,7 @@ class _HistoryPageState extends State<HistoryPage> {
                         _initVisitorList();
                       },
                       child: Text(
-                        'Me',
+                        'Walk in',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w500,
@@ -111,48 +107,47 @@ class _HistoryPageState extends State<HistoryPage> {
                     ),
                     Container(
                       height: 2,
-                      width: MediaQuery.of(context).size.width / 3 -
-                          20,
+                      width: MediaQuery.of(context).size.width / 2-20,
                       color: selected == 'Me'
                           ? Color(0xFF3629B7)
                           : Colors.grey,
                     ),
                   ],
                 ),
-                SizedBox(
-                  width: 10,
-                ),
-                Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selected = 'Other';
-                        });
-                        setSelectedTab('other');
-                        _initVisitorList();
-                      },
-                      child: Text(
-                        'Other',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w500,
-                          color: selected == 'Other'
-                              ? Color(0xFF3629B7)
-                              : Colors.grey,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 2,
-                      width: MediaQuery.of(context).size.width / 3 -
-                          20,
-                      color: selected == 'Other'
-                          ? Color(0xFF3629B7)
-                          : Colors.grey,
-                    ),
-                  ],
-                ),
+                // SizedBox(
+                //   width: 10,
+                // ),
+                // Column(
+                //   children: [
+                //     GestureDetector(
+                //       onTap: () {
+                //         setState(() {
+                //           selected = 'Other';
+                //         });
+                //         setSelectedTab('other');
+                //         _initVisitorList();
+                //       },
+                //       child: Text(
+                //         'Other',
+                //         style: TextStyle(
+                //           fontSize: 20,
+                //           fontWeight: FontWeight.w500,
+                //           color: selected == 'Other'
+                //               ? Color(0xFF3629B7)
+                //               : Colors.grey,
+                //         ),
+                //       ),
+                //     ),
+                //     Container(
+                //       height: 2,
+                //       width: MediaQuery.of(context).size.width / 3 -
+                //           20,
+                //       color: selected == 'Other'
+                //           ? Color(0xFF3629B7)
+                //           : Colors.grey,
+                //     ),
+                //   ],
+                // ),
               ],
             ),
             Padding(

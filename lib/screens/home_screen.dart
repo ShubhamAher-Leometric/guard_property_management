@@ -8,6 +8,7 @@ import 'package:guard_property_management/screens/settings_screen.dart';
 import 'package:guard_property_management/screens/visitor_details_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../api_bloc/bloc/get_profile_bloc/get_profile_bloc.dart';
 import '../api_bloc/bloc/notification_count_bloc/notification_count_bloc.dart';
 import 'notification.dart';
 
@@ -20,9 +21,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  TextEditingController _searchController = TextEditingController();
   VisitorListingBloc _visitorListingBloc = VisitorListingBloc();
   late NotificationCountBloc _notificationCountBloc = NotificationCountBloc();
-
+  late GetProfileBloc _getProfileBloc = GetProfileBloc();
 
   late SharedPreferences prefs;
   int _selectedIndex = 0;
@@ -38,11 +40,21 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     Setdatefilter('this_month');
     setSelectedTab('owner');
+    SetFacilityStrSearch('');
     _loadProfilePic();
     _initVisitorList();
     _notificationCountBloc.add(GetNotificationCountEvent());
+    _getProfileBloc.add(GetProfileDataEvent());
+  }
+  void _Searchfaclitystate() async {
+    _initVisitorList();
   }
 
+  void _navigateToSearch(String query) {
+    SetFacilityStrSearch(query).then((_) {
+      _Searchfaclitystate();
+    });
+  }
   Future<void> _initVisitorList() async {
     _visitorListingBloc.add(VisitorListEventData());
   }
@@ -74,20 +86,72 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: EdgeInsets.all(20),
                   child: Row(
                     children: <Widget>[
-                      CircleAvatar(
-                        radius: 24,
-                        backgroundColor: Colors.white,
-                        backgroundImage: _profilePic != null
-                            ? NetworkImage(_profilePic!)
-                            : AssetImage('assets/Home.png'),
-                      ),
-                      SizedBox(width: 15),
-                      Text(
-                        'Hi, '+_userName!,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
+                      BlocProvider(
+                        create: (context) => _getProfileBloc,
+                        child: BlocBuilder<GetProfileBloc, GetProfileState>(
+                          builder: (context, state) {
+                            if (state is GetProfileLoading) {
+                              return Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: AssetImage('assets/images/dummy_user.jpeg'),
+                                  ),
+                                  SizedBox(width: 15),
+                                  Text(
+                                    'Hi,',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            } else if (state is GetProfileLoaded) {
+                              return Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.white,
+                                    backgroundImage: NetworkImage(state
+                                        .getProfileModel.data!.profileImage
+                                        .toString()),
+                                  ),
+                                  SizedBox(width: 15),
+                                  Text(
+                                    'Hi, ' +
+                                        state.getProfileModel.data!.name
+                                            .toString(),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                            return Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 24,
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: AssetImage('assets/images/dummy_user.jpeg'),
+                                ),
+                                SizedBox(width: 15),
+                                Text(
+                                  'Hi, user dashboard',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 19,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
                       ),
                       Spacer(),
@@ -177,6 +241,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       onRefresh: () async{
                         _initVisitorList();
                         _notificationCountBloc.add(GetNotificationCountEvent());
+                        _getProfileBloc.add(GetProfileDataEvent());
+                        _searchController.clear();
+                        SetFacilityStrSearch('');
                       },
                       child: Column(
                         children: [
@@ -199,19 +266,71 @@ class _HomeScreenState extends State<HomeScreen> {
                                               HistoryPage()),
                                     );
                                   },
-                                  child: Text(
-                                    'History',
-                                    style: TextStyle(fontSize: 18,color: Colors.blue),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFFFEBE9FF),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(5.0),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.history_outlined,
+                                            color: Color(0xFFFF3629B7),
+                                          ),
+                                          Text(
+                                            'History',
+                                            style: TextStyle(fontSize: 18,
+                                              color: Color(0xFFFF3629B7),),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                          Divider(),
-                          // SizedBox(height: 10),
+                          SizedBox(height: 10,),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Color(0xFFFFF4F4F4),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.search,
+                                      color:Colors.grey ,
+                                    ),
+                                    SizedBox(width: 8), // add spacing between icon and text
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _searchController,
+                                        decoration: InputDecoration(
+                                          hintText: 'Type hear to search...',
+                                          border: InputBorder.none,
+                                        ),
+                                        onSubmitted: (text) {
+                                          _navigateToSearch(text);
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
+                              Spacer(),
                               Column(
                                 children: [
                                   GestureDetector(
@@ -223,7 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       _initVisitorList();
                                     },
                                     child: Text(
-                                      'Owner',
+                                      'Invite by owner',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
@@ -235,7 +354,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Container(
                                     height: 2,
-                                    width: MediaQuery.of(context).size.width / 3 -
+                                    width: MediaQuery.of(context).size.width / 2 -
                                         20,
                                     color: selected == 'Owner'
                                         ? Color(0xFF3629B7)
@@ -243,9 +362,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
+                              Spacer(),
                               Column(
                                 children: [
                                   GestureDetector(
@@ -257,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       _initVisitorList();
                                     },
                                     child: Text(
-                                      'Me',
+                                      'Walk in',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w500,
@@ -269,7 +386,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   Container(
                                     height: 2,
-                                    width: MediaQuery.of(context).size.width / 3 -
+                                    width: MediaQuery.of(context).size.width / 2 -
                                         20,
                                     color: selected == 'Me'
                                         ? Color(0xFF3629B7)
@@ -277,76 +394,44 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        selected = 'Other';
-                                      });
-                                      setSelectedTab('other');
-                                      _initVisitorList();
-                                    },
-                                    child: Text(
-                                      'Other',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w500,
-                                        color: selected == 'Other'
-                                            ? Color(0xFF3629B7)
-                                            : Colors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    height: 2,
-                                    width: MediaQuery.of(context).size.width / 3 -
-                                        20,
-                                    color: selected == 'Other'
-                                        ? Color(0xFF3629B7)
-                                        : Colors.grey,
-                                  ),
-                                ],
-                              ),
+                            Spacer(),
                             ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                GestureDetector(
-                                  onTap: _showDateFilterPopup,
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 5),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          _selectedDateFilter,
-                                          style: TextStyle(
-                                              fontSize: 16, color: Colors.grey),
-                                        ),
-                                        SizedBox(
-                                          width: 5,
-                                        ),
-                                        Icon(Icons.keyboard_arrow_down,
-                                            color: Colors.grey),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(
+                          //       vertical: 10.0, horizontal: 10),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.end,
+                          //     children: [
+                          //       GestureDetector(
+                          //         onTap: _showDateFilterPopup,
+                          //         child: Container(
+                          //           padding: EdgeInsets.symmetric(
+                          //               horizontal: 10, vertical: 5),
+                          //           decoration: BoxDecoration(
+                          //             color: Colors.grey[200],
+                          //             borderRadius: BorderRadius.circular(20),
+                          //           ),
+                          //           child: Row(
+                          //             children: [
+                          //               Text(
+                          //                 _selectedDateFilter,
+                          //                 style: TextStyle(
+                          //                     fontSize: 16, color: Colors.grey),
+                          //               ),
+                          //               SizedBox(
+                          //                 width: 5,
+                          //               ),
+                          //               Icon(Icons.keyboard_arrow_down,
+                          //                   color: Colors.grey),
+                          //             ],
+                          //           ),
+                          //         ),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
+                          SizedBox(height: 10,),
                           BlocProvider(
                             create: (context) => _visitorListingBloc,
                             child: BlocBuilder<VisitorListingBloc,
@@ -553,9 +638,35 @@ class _HomeScreenState extends State<HomeScreen> {
                                     ),
                                   );
                                 } else if (state is VisitorListingError) {
-                                  return Expanded(child: Container());
+                                  return RefreshIndicator(
+                                    onRefresh: () async {
+                                      _initVisitorList();
+                                      _notificationCountBloc.add(GetNotificationCountEvent());
+                                      _searchController.clear();
+                                      SetFacilityStrSearch('');
+                                    },
+                                    child: SingleChildScrollView(
+                                      physics: const AlwaysScrollableScrollPhysics(), // Makes sure the widget is scrollable
+                                      child: Container(
+                                        height: 200,
+                                      ),
+                                    ),
+                                  );
                                 }
-                                return Expanded(child: Container());
+                                return RefreshIndicator(
+                                  onRefresh: () async {
+                                    _initVisitorList();
+                                    _notificationCountBloc.add(GetNotificationCountEvent());
+                                    _searchController.clear();
+                                    SetFacilityStrSearch('');
+                                  },
+                                  child: SingleChildScrollView(
+                                    physics: const AlwaysScrollableScrollPhysics(), // Makes sure the widget is scrollable
+                                    child: Container(
+                                      height: 200,
+                                    ),
+                                  ),
+                                );
                               },
                             ),
                           ),
@@ -583,473 +694,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
-                    // child: DefaultTabController(
-                    //   length: 2,
-                    //   child: Column(
-                    //     children: [
-                    //       SizedBox(height: 10),
-                    //       Text(
-                    //         'Visitor Request',
-                    //         style: TextStyle(fontSize: 18),
-                    //       ),
-                    //       TabBar(
-                    //         unselectedLabelColor: Colors.black,
-                    //         labelColor: Colors.blue,
-                    //         indicatorSize: TabBarIndicatorSize.tab,
-                    //         indicator: UnderlineTabIndicator(
-                    //           borderSide: BorderSide(
-                    //             width: 4.0,
-                    //             color: Colors.blue,
-                    //           ),
-                    //           insets: EdgeInsets.symmetric(horizontal: 10.0),
-                    //         ),
-                    //         tabs: [Tab(text: "Owner"), Tab(text: "Me")],
-                    //         onTap: (index) {
-                    //           setSelectedTab(index == 0 ? 'owner' : 'guard');
-                    //           _initVisitorList();
-                    //         },
-                    //       ),
-                    //       Expanded(
-                    //         child: TabBarView(
-                    //           physics: const NeverScrollableScrollPhysics(),
-                    //           children: [
-                    //             Column(
-                    //               children: [
-                    //                 Padding(
-                    //                   padding: const EdgeInsets.symmetric(
-                    //                       vertical: 5.0),
-                    //                   child: Row(
-                    //                     mainAxisAlignment:
-                    //                         MainAxisAlignment.end,
-                    //                     children: [
-                    //                       GestureDetector(
-                    //                         onTap: _showDateFilterPopup,
-                    //                         child: Container(
-                    //                           padding: EdgeInsets.symmetric(
-                    //                               horizontal: 10, vertical: 5),
-                    //                           decoration: BoxDecoration(
-                    //                             color: Colors.grey[200],
-                    //                             borderRadius:
-                    //                                 BorderRadius.circular(20),
-                    //                           ),
-                    //                           child: Row(
-                    //                             children: [
-                    //                               Text(
-                    //                                 _selectedDateFilter,
-                    //                                 style: TextStyle(
-                    //                                     fontSize: 16,
-                    //                                     color: Colors.grey),
-                    //                               ),
-                    //                               SizedBox(
-                    //                                 width: 5,
-                    //                               ),
-                    //                               Icon(
-                    //                                   Icons.keyboard_arrow_down,
-                    //                                   color: Colors.grey),
-                    //                             ],
-                    //                           ),
-                    //                         ),
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //                 BlocProvider(
-                    //                   create: (context) => _visitorListingBloc,
-                    //                   child: BlocBuilder<VisitorListingBloc,
-                    //                       VisitorListingState>(
-                    //                     builder: (context, state) {
-                    //                       if (state is VisitorListingLoading) {
-                    //                         return Container();
-                    //                       } else if (state
-                    //                           is VisitorListingLoaded) {
-                    //                         return Expanded(
-                    //                           child: ListView.builder(
-                    //                             padding: EdgeInsets.zero,
-                    //                             itemCount: state
-                    //                                 .vistorListingModel
-                    //                                 .data!
-                    //                                 .length,
-                    //                             itemBuilder: (context, index) {
-                    //                               return GestureDetector(
-                    //                                 child: Container(
-                    //                                   height: 86,
-                    //                                   margin: EdgeInsets.only(
-                    //                                       left: 10,
-                    //                                       right: 10,
-                    //                                       bottom: 8),
-                    //                                   decoration: BoxDecoration(
-                    //                                     color: Colors.white,
-                    //                                     borderRadius:
-                    //                                         BorderRadius
-                    //                                             .circular(15),
-                    //                                     boxShadow: [
-                    //                                       BoxShadow(
-                    //                                         color: Colors.grey
-                    //                                             .withOpacity(
-                    //                                                 0.2),
-                    //                                         spreadRadius: 2,
-                    //                                         blurRadius: 5,
-                    //                                         offset:
-                    //                                             Offset(0, 3),
-                    //                                       ),
-                    //                                     ],
-                    //                                   ),
-                    //                                   child: Padding(
-                    //                                     padding: EdgeInsets
-                    //                                         .symmetric(
-                    //                                             horizontal: 10),
-                    //                                     child: Row(
-                    //                                       children: [
-                    //                                         Container(
-                    //                                           width: MediaQuery.of(
-                    //                                                       context)
-                    //                                                   .size
-                    //                                                   .width /
-                    //                                               2,
-                    //                                           child: Column(
-                    //                                             crossAxisAlignment:
-                    //                                                 CrossAxisAlignment
-                    //                                                     .start,
-                    //                                             mainAxisAlignment:
-                    //                                                 MainAxisAlignment
-                    //                                                     .center,
-                    //                                             children: [
-                    //                                               Text(
-                    //                                                 state
-                    //                                                     .vistorListingModel
-                    //                                                     .data![
-                    //                                                         index]
-                    //                                                     .name
-                    //                                                     .toString(),
-                    //                                                 style:
-                    //                                                     TextStyle(
-                    //                                                   fontSize:
-                    //                                                       16,
-                    //                                                   color: Colors
-                    //                                                       .black,
-                    //                                                 ),
-                    //                                                 overflow:
-                    //                                                     TextOverflow
-                    //                                                         .visible,
-                    //                                                 maxLines: 2,
-                    //                                               ),
-                    //                                               Text(
-                    //                                                 state
-                    //                                                     .vistorListingModel
-                    //                                                     .data![
-                    //                                                         index]
-                    //                                                     .unitInfo
-                    //                                                     .toString(),
-                    //                                                 style:
-                    //                                                     TextStyle(
-                    //                                                   fontSize:
-                    //                                                       16,
-                    //                                                   color: Colors
-                    //                                                       .black,
-                    //                                                 ),
-                    //                                                 overflow:
-                    //                                                     TextOverflow
-                    //                                                         .visible,
-                    //                                                 maxLines: 2,
-                    //                                               ),
-                    //                                             ],
-                    //                                           ),
-                    //                                         ),
-                    //                                         Column(
-                    //                                           crossAxisAlignment:
-                    //                                               CrossAxisAlignment
-                    //                                                   .start,
-                    //                                           mainAxisAlignment:
-                    //                                               MainAxisAlignment
-                    //                                                   .center,
-                    //                                           children: [
-                    //                                             Text(
-                    //                                               state
-                    //                                                   .vistorListingModel
-                    //                                                   .data![
-                    //                                                       index]
-                    //                                                   .visitDate
-                    //                                                   .toString(),
-                    //                                               style:
-                    //                                                   TextStyle(
-                    //                                                 fontSize:
-                    //                                                     16,
-                    //                                                 color: Colors
-                    //                                                     .black,
-                    //                                               ),
-                    //                                               overflow:
-                    //                                                   TextOverflow
-                    //                                                       .visible,
-                    //                                               maxLines: 2,
-                    //                                             ),
-                    //                                             Text(
-                    //                                               state
-                    //                                                   .vistorListingModel
-                    //                                                   .data![
-                    //                                                       index]
-                    //                                                   .mobileNumber
-                    //                                                   .toString(),
-                    //                                               style:
-                    //                                                   TextStyle(
-                    //                                                 fontSize:
-                    //                                                     16,
-                    //                                                 color: Colors
-                    //                                                     .black,
-                    //                                               ),
-                    //                                               overflow:
-                    //                                                   TextOverflow
-                    //                                                       .visible,
-                    //                                               maxLines: 2,
-                    //                                             ),
-                    //                                           ],
-                    //                                         ),
-                    //                                       ],
-                    //                                     ),
-                    //                                   ),
-                    //                                 ),
-                    //                               );
-                    //                             },
-                    //                           ),
-                    //                         );
-                    //                       } else if (state
-                    //                           is VisitorListingError) {
-                    //                         return Container();
-                    //                       }
-                    //                       return Container();
-                    //                     },
-                    //                   ),
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //             Column(
-                    //               children: [
-                    //                 Padding(
-                    //                   padding: const EdgeInsets.symmetric(
-                    //                       vertical: 5.0),
-                    //                   child: Row(
-                    //                     mainAxisAlignment:
-                    //                         MainAxisAlignment.end,
-                    //                     children: [
-                    //                       GestureDetector(
-                    //                         onTap: _showDateFilterPopup,
-                    //                         child: Container(
-                    //                           padding: EdgeInsets.symmetric(
-                    //                               horizontal: 10, vertical: 5),
-                    //                           decoration: BoxDecoration(
-                    //                             color: Colors.grey[200],
-                    //                             borderRadius:
-                    //                                 BorderRadius.circular(20),
-                    //                           ),
-                    //                           child: Row(
-                    //                             children: [
-                    //                               Text(
-                    //                                 _selectedDateFilter,
-                    //                                 style: TextStyle(
-                    //                                     fontSize: 16,
-                    //                                     color: Colors.grey),
-                    //                               ),
-                    //                               SizedBox(
-                    //                                 width: 5,
-                    //                               ),
-                    //                               Icon(
-                    //                                   Icons.keyboard_arrow_down,
-                    //                                   color: Colors.grey),
-                    //                             ],
-                    //                           ),
-                    //                         ),
-                    //                       ),
-                    //                     ],
-                    //                   ),
-                    //                 ),
-                    //                 BlocProvider(
-                    //                   create: (context) => _visitorListingBloc,
-                    //                   child: BlocBuilder<VisitorListingBloc,
-                    //                       VisitorListingState>(
-                    //                     builder: (context, state) {
-                    //                       if (state is VisitorListingLoading) {
-                    //                         return Expanded(child: Container());
-                    //                       } else if (state
-                    //                           is VisitorListingLoaded) {
-                    //                         return Expanded(
-                    //                           child: ListView.builder(
-                    //                             padding: EdgeInsets.zero,
-                    //                             itemCount: state
-                    //                                 .vistorListingModel
-                    //                                 .data!
-                    //                                 .length,
-                    //                             itemBuilder: (context, index) {
-                    //                               return GestureDetector(
-                    //                                 child: Container(
-                    //                                   height: 86,
-                    //                                   margin: EdgeInsets.only(
-                    //                                       left: 10,
-                    //                                       right: 10,
-                    //                                       bottom: 8),
-                    //                                   decoration: BoxDecoration(
-                    //                                     color: Colors.white,
-                    //                                     borderRadius:
-                    //                                         BorderRadius
-                    //                                             .circular(15),
-                    //                                     boxShadow: [
-                    //                                       BoxShadow(
-                    //                                         color: Colors.grey
-                    //                                             .withOpacity(
-                    //                                                 0.2),
-                    //                                         spreadRadius: 2,
-                    //                                         blurRadius: 5,
-                    //                                         offset:
-                    //                                             Offset(0, 3),
-                    //                                       ),
-                    //                                     ],
-                    //                                   ),
-                    //                                   child: Padding(
-                    //                                     padding: EdgeInsets
-                    //                                         .symmetric(
-                    //                                             horizontal: 10),
-                    //                                     child: Row(
-                    //                                       children: [
-                    //                                         Container(
-                    //                                           width: MediaQuery.of(
-                    //                                                       context)
-                    //                                                   .size
-                    //                                                   .width /
-                    //                                               2,
-                    //                                           child: Column(
-                    //                                             crossAxisAlignment:
-                    //                                                 CrossAxisAlignment
-                    //                                                     .start,
-                    //                                             mainAxisAlignment:
-                    //                                                 MainAxisAlignment
-                    //                                                     .center,
-                    //                                             children: [
-                    //                                               Text(
-                    //                                                 state
-                    //                                                     .vistorListingModel
-                    //                                                     .data![
-                    //                                                         index]
-                    //                                                     .name
-                    //                                                     .toString(),
-                    //                                                 style:
-                    //                                                     TextStyle(
-                    //                                                   fontSize:
-                    //                                                       16,
-                    //                                                   color: Colors
-                    //                                                       .black,
-                    //                                                 ),
-                    //                                                 overflow:
-                    //                                                     TextOverflow
-                    //                                                         .visible,
-                    //                                                 maxLines: 2,
-                    //                                               ),
-                    //                                               Text(
-                    //                                                 state
-                    //                                                     .vistorListingModel
-                    //                                                     .data![
-                    //                                                         index]
-                    //                                                     .unitInfo
-                    //                                                     .toString(),
-                    //                                                 style:
-                    //                                                     TextStyle(
-                    //                                                   fontSize:
-                    //                                                       16,
-                    //                                                   color: Colors
-                    //                                                       .black,
-                    //                                                 ),
-                    //                                                 overflow:
-                    //                                                     TextOverflow
-                    //                                                         .visible,
-                    //                                                 maxLines: 2,
-                    //                                               ),
-                    //                                             ],
-                    //                                           ),
-                    //                                         ),
-                    //                                         Column(
-                    //                                           crossAxisAlignment:
-                    //                                               CrossAxisAlignment
-                    //                                                   .start,
-                    //                                           mainAxisAlignment:
-                    //                                               MainAxisAlignment
-                    //                                                   .center,
-                    //                                           children: [
-                    //                                             Text(
-                    //                                               state
-                    //                                                   .vistorListingModel
-                    //                                                   .data![
-                    //                                                       index]
-                    //                                                   .visitDate
-                    //                                                   .toString(),
-                    //                                               style:
-                    //                                                   TextStyle(
-                    //                                                 fontSize:
-                    //                                                     16,
-                    //                                                 color: Colors
-                    //                                                     .black,
-                    //                                               ),
-                    //                                               overflow:
-                    //                                                   TextOverflow
-                    //                                                       .visible,
-                    //                                               maxLines: 2,
-                    //                                             ),
-                    //                                             Text(
-                    //                                               state
-                    //                                                   .vistorListingModel
-                    //                                                   .data![
-                    //                                                       index]
-                    //                                                   .mobileNumber
-                    //                                                   .toString(),
-                    //                                               style:
-                    //                                                   TextStyle(
-                    //                                                 fontSize:
-                    //                                                     16,
-                    //                                                 color: Colors
-                    //                                                     .black,
-                    //                                               ),
-                    //                                               overflow:
-                    //                                                   TextOverflow
-                    //                                                       .visible,
-                    //                                               maxLines: 2,
-                    //                                             ),
-                    //                                           ],
-                    //                                         ),
-                    //                                       ],
-                    //                                     ),
-                    //                                   ),
-                    //                                 ),
-                    //                               );
-                    //                             },
-                    //                           ),
-                    //                         );
-                    //                       } else if (state
-                    //                           is VisitorListingError) {
-                    //                         return Expanded(child: Container());
-                    //                       }
-                    //                       return Expanded(child: Container());
-                    //                     },
-                    //                   ),
-                    //                 ),
-                    //                 ElevatedButton.icon(
-                    //                   onPressed: () {},
-                    //                   icon: Icon(Icons.add),
-                    //                   label: Text('Add Visitor'),
-                    //                   style: ElevatedButton.styleFrom(
-                    //                     foregroundColor: Colors.white,
-                    //                     backgroundColor: Color(0xFF3629B7),
-                    //                     padding: EdgeInsets.symmetric(
-                    //                         horizontal: 30, vertical: 15),
-                    //                     shape: RoundedRectangleBorder(
-                    //                       borderRadius:
-                    //                           BorderRadius.circular(25),
-                    //                     ),
-                    //                   ),
-                    //                 ),
-                    //               ],
-                    //             ),
-                    //           ],
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
                   ),
                 ),
               ],
@@ -1171,6 +815,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> SetFacilityStrSearch(String str_Search) async {
+    final SharedPreferences prefs = await _prefs;
+    setState(() {
+      prefs.setString('Str_Search', str_Search);
+      print('Searching..... :' + str_Search.toString());
+    });
+  }
   void _showDateFilterPopup() {
     showDialog(
       context: context,

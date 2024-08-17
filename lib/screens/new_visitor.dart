@@ -140,9 +140,11 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
   }
   void _validatePhoneNumber() {
     final text = _phoneNumberController.text;
-    if (text.length < 10 || text.length > 12) {
+    if (text.length < 10 || text.length > 11) {
       setState(() {
-        _errorText = 'Phone number must be between 10 and 12 digits';
+        // _errorText = 'Phone number must be between 10 and 12 digits';
+        _errorText = 'Phone number must be between 11 digits';
+
       });
     } else {
       setState(() {
@@ -228,17 +230,6 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
       });
       return;
     }
-    if (_entryController.text.isEmpty) {
-      setState(() {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Please Select Visitors Entry Type"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      });
-      return;
-    }
     setState(() {
       isUploading = true;
     });
@@ -257,9 +248,9 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
     request.fields['mob_number'] = _phoneNumberController.text;
     request.fields['date'] = _dateController.text;
     request.fields['visit_time'] = _timeController.text;
-    request.fields['visit_type'] = _visitorTypeController.text;
+    request.fields['visit_type'] = 'Walk in';
     request.fields['expired_date'] = _expirydateController.text;
-    request.fields['entry_type'] = _entryController.text;
+    // request.fields['entry_type'] = _entryController.text;
     request.fields['nric_passport_no'] = _idController.text;
     request.fields['vehicle_number'] = _vehicleController.text;
     request.fields['remark'] = _remarkController.text;
@@ -546,7 +537,7 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                 keyboardType: TextInputType.phone,
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(12),
+                  LengthLimitingTextInputFormatter(11),
                 ],
                 decoration: InputDecoration(
                   hintText: 'Enter Phone Number',
@@ -665,198 +656,198 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
 
 
 
-              const  SizedBox(height: 16),
-              const Text(
-                'Visitor Type',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-              Container(
-                height: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  //color: Colors.white,
-                  border: Border.all(
-                    color: Colors.black, // Set border color here
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isFifthContainerVisible = !isFifthContainerVisible;
-                          });
-                        },
-                        child: AbsorbPointer(
-                          absorbing: true,
-                          child: TextField(
-                            controller: _visitorTypeController,
-                            decoration: const InputDecoration(
-                              hintText: 'Select Visitor Type',
-                              contentPadding: EdgeInsets.all(12.0),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isFifthContainerVisible = !isFifthContainerVisible;
-                        });
-                      },
-                      icon: const Icon(Icons.arrow_drop_down), // Change the icon as needed
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 5.0),
-              Visibility(
-                visible: isFifthContainerVisible,
-                child: SizedBox(
-                  width: 347.0, // Specify width here
-                  child: Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.white,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 0.1,
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: visitorType.length, // Adjust the count as needed
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0), // Adjust the spacing as needed
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _visitorTypeController.text = visitorType[index];
-                                      isFifthContainerVisible = false;
-                                    });
-                                  },
-                                  child: Text(
-                                    visitorType[index],
-                                    style: const TextStyle(fontSize: 14.0),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // const  SizedBox(height: 16),
+              // const Text(
+              //   'Visitor Type',
+              //   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              // ),
+              // Container(
+              //   height: 60,
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(10.0),
+              //     //color: Colors.white,
+              //     border: Border.all(
+              //       color: Colors.black, // Set border color here
+              //     ),
+              //   ),
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: GestureDetector(
+              //           onTap: () {
+              //             setState(() {
+              //               isFifthContainerVisible = !isFifthContainerVisible;
+              //             });
+              //           },
+              //           child: AbsorbPointer(
+              //             absorbing: true,
+              //             child: TextField(
+              //               controller: _visitorTypeController,
+              //               decoration: const InputDecoration(
+              //                 hintText: 'Select Visitor Type',
+              //                 contentPadding: EdgeInsets.all(12.0),
+              //                 border: InputBorder.none,
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       IconButton(
+              //         onPressed: () {
+              //           setState(() {
+              //             isFifthContainerVisible = !isFifthContainerVisible;
+              //           });
+              //         },
+              //         icon: const Icon(Icons.arrow_drop_down), // Change the icon as needed
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 5.0),
+              // Visibility(
+              //   visible: isFifthContainerVisible,
+              //   child: SizedBox(
+              //     width: 347.0, // Specify width here
+              //     child: Center(
+              //       child: Container(
+              //         decoration: BoxDecoration(
+              //           borderRadius: BorderRadius.circular(10.0),
+              //           color: Colors.white,
+              //           boxShadow: const [
+              //             BoxShadow(
+              //               color: Colors.grey,
+              //               blurRadius: 0.1,
+              //             ),
+              //           ],
+              //         ),
+              //         padding: const EdgeInsets.all(16.0),
+              //         child: Column(
+              //           crossAxisAlignment: CrossAxisAlignment.start,
+              //           children: [
+              //             ListView.builder(
+              //               shrinkWrap: true,
+              //               itemCount: visitorType.length, // Adjust the count as needed
+              //               itemBuilder: (BuildContext context, int index) {
+              //                 return Padding(
+              //                   padding: const EdgeInsets.only(bottom: 8.0), // Adjust the spacing as needed
+              //                   child: GestureDetector(
+              //                     onTap: () {
+              //                       setState(() {
+              //                         _visitorTypeController.text = visitorType[index];
+              //                         isFifthContainerVisible = false;
+              //                       });
+              //                     },
+              //                     child: Text(
+              //                       visitorType[index],
+              //                       style: const TextStyle(fontSize: 14.0),
+              //                     ),
+              //                   ),
+              //                 );
+              //               },
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
 
-              const  SizedBox(height: 16),
-
-              const Text(
-                'Entry',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-              Container(
-                height: 60,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  //color: Colors.white,
-                  border: Border.all(
-                    color: Colors.black, // Set border color here
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            isSixthContainerVisible = !isSixthContainerVisible;
-                          });
-                        },
-                        child: AbsorbPointer(
-                          absorbing: true,
-                          child: TextField(
-                            controller: _entryController,
-                            decoration: const InputDecoration(
-                              hintText: 'Select Entry Type',
-                              contentPadding: EdgeInsets.all(12.0),
-                              border: InputBorder.none,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isSixthContainerVisible = !isSixthContainerVisible;
-                        });
-                      },
-                      icon: const Icon(Icons.arrow_drop_down), // Change the icon as needed
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 5.0),
-              Visibility(
-                visible: isSixthContainerVisible,
-                child: SizedBox(
-                  width: 347.0, // Specify width here
-                  child: Center(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: Colors.white,
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Colors.grey,
-                            blurRadius: 0.1,
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: entry.length, // Adjust the count as needed
-                            itemBuilder: (BuildContext context, int index) {
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0), // Adjust the spacing as needed
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _entryController.text = entry[index];
-                                      isSixthContainerVisible = false;
-                                    });
-                                  },
-                                  child: Text(
-                                    entry[index],
-                                    style: const TextStyle(fontSize: 14.0),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // const  SizedBox(height: 16),
+              //
+              // const Text(
+              //   'Entry',
+              //   style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              // ),
+              // Container(
+              //   height: 60,
+              //   decoration: BoxDecoration(
+              //     borderRadius: BorderRadius.circular(10.0),
+              //     //color: Colors.white,
+              //     border: Border.all(
+              //       color: Colors.black, // Set border color here
+              //     ),
+              //   ),
+              //   child: Row(
+              //     children: [
+              //       Expanded(
+              //         child: GestureDetector(
+              //           onTap: () {
+              //             setState(() {
+              //               isSixthContainerVisible = !isSixthContainerVisible;
+              //             });
+              //           },
+              //           child: AbsorbPointer(
+              //             absorbing: true,
+              //             child: TextField(
+              //               controller: _entryController,
+              //               decoration: const InputDecoration(
+              //                 hintText: 'Select Entry Type',
+              //                 contentPadding: EdgeInsets.all(12.0),
+              //                 border: InputBorder.none,
+              //               ),
+              //             ),
+              //           ),
+              //         ),
+              //       ),
+              //       IconButton(
+              //         onPressed: () {
+              //           setState(() {
+              //             isSixthContainerVisible = !isSixthContainerVisible;
+              //           });
+              //         },
+              //         icon: const Icon(Icons.arrow_drop_down), // Change the icon as needed
+              //       ),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 5.0),
+              // Visibility(
+              //   visible: isSixthContainerVisible,
+              //   child: SizedBox(
+              //     width: 347.0, // Specify width here
+              //     child: Center(
+              //       child: Container(
+              //         decoration: BoxDecoration(
+              //           borderRadius: BorderRadius.circular(10.0),
+              //           color: Colors.white,
+              //           boxShadow: const [
+              //             BoxShadow(
+              //               color: Colors.grey,
+              //               blurRadius: 0.1,
+              //             ),
+              //           ],
+              //         ),
+              //         padding: const EdgeInsets.all(16.0),
+              //         child: Column(
+              //           crossAxisAlignment: CrossAxisAlignment.start,
+              //           children: [
+              //             ListView.builder(
+              //               shrinkWrap: true,
+              //               itemCount: entry.length, // Adjust the count as needed
+              //               itemBuilder: (BuildContext context, int index) {
+              //                 return Padding(
+              //                   padding: const EdgeInsets.only(bottom: 8.0), // Adjust the spacing as needed
+              //                   child: GestureDetector(
+              //                     onTap: () {
+              //                       setState(() {
+              //                         _entryController.text = entry[index];
+              //                         isSixthContainerVisible = false;
+              //                       });
+              //                     },
+              //                     child: Text(
+              //                       entry[index],
+              //                       style: const TextStyle(fontSize: 14.0),
+              //                     ),
+              //                   ),
+              //                 );
+              //               },
+              //             ),
+              //           ],
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 10.0),
               const   Text(
                 'NRIC/Passport No',
@@ -874,7 +865,7 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
               ),
               const SizedBox(height: 16),
               const Text(
-                'Attach Image of ID',
+                'Image of ID',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

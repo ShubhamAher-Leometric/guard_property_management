@@ -148,7 +148,7 @@ class _login_pageState extends State<login_page> {
                       } else if (state is LoginApiblockError) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(state.message!),
+                            content: Text('Please enter valid credentials'),
                             backgroundColor: Colors.red,
                           ),
                         );

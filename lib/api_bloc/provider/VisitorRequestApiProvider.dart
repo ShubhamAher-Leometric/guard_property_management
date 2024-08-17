@@ -18,9 +18,11 @@ class VisitorRequestApiProvider {
       var property_id =await prefs.getString('Guard_property_id');
       var selected_tab =await prefs.getString('selected_tab');
       var visitor_filtor =await prefs.getString('visitor_filter');
+      var str_search =await prefs.getString('Str_Search');
+
 
       print("Visitor list Request");
-      final String _url = '${AppConstants.BASE_URL}/api/get-property-visitors-listing-by-guard?request_type=$selected_tab&property_id=$property_id&date_filter=$visitor_filtor&guard_id=$user_id';
+      final String _url = '${AppConstants.BASE_URL}/api/get-property-visitors-listing-by-guard?request_type=$selected_tab&property_id=$property_id&date_filter=$visitor_filtor&guard_id=$user_id&str_search=$str_search';
 
       Response response = await _dio.get(
         _url,
