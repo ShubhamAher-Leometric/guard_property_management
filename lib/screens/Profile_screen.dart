@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -80,9 +81,7 @@ class _ProfileState extends State<Profile> {
     final text = _phoneController.text;
     if (text.length < 10 || text.length > 11) {
       setState(() {
-        // _errorText = 'Phone number must be between 10 and 12 digits';
         _errorText = 'Phone number must be between 11 digits';
-
       });
     } else {
       setState(() {
@@ -141,8 +140,16 @@ class _ProfileState extends State<Profile> {
         // Get.back(result: true);
       } else {
         setState(() {
-          errorMessage = "Upload failed: $responseData";
+          Map<String, dynamic> parsedResponse = json.decode(responseData);
+          String extractedMessage = parsedResponse['message']['mobile_number'][0];
+          errorMessage = "$extractedMessage";
           isUploading = false;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage!),
+              backgroundColor: Colors.red,
+            ),
+          );
         });
         print(errorMessage);
       }
@@ -222,7 +229,7 @@ class _ProfileState extends State<Profile> {
                             CircleAvatar(
                               radius: screenHeight * 0.06,
                               backgroundColor: Colors.red,
-                              backgroundImage: AssetImage('assets/images/dummy-avatar.jpg'),
+                              backgroundImage: AssetImage('assets/images/dummy_user.jpeg'),
                             ),
                           ],
                         ),
@@ -300,7 +307,7 @@ class _ProfileState extends State<Profile> {
                                   padding: EdgeInsets.symmetric(horizontal: 16), // Add some padding for the text field
                                   child: TextField(
                                     decoration: InputDecoration(
-                                      hintText: 'example@gmail.com',
+                                      hintText: '',
                                       border: InputBorder.none, // Hide the default border of the text field
                                     ),
                                     keyboardType: TextInputType.emailAddress,
@@ -326,7 +333,7 @@ class _ProfileState extends State<Profile> {
                                   padding: EdgeInsets.symmetric(horizontal: 16), // Add some padding for the text field
                                   child: TextField(
                                     decoration: InputDecoration(
-                                      hintText: '9214 77710 51',
+                                      hintText: '',
                                       border: InputBorder.none, // Hide the default border of the text field
                                     ),
                                     keyboardType: TextInputType.phone,
@@ -364,7 +371,8 @@ class _ProfileState extends State<Profile> {
                       ),
                     ],
                   );
-                } else if(state is GetProfileLoaded){
+                }
+                else if(state is GetProfileLoaded){
                   if (_nameController.text.isEmpty) {
                     _nameController.text = state.getProfileModel.data!.name!;
                   }
@@ -478,10 +486,6 @@ class _ProfileState extends State<Profile> {
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               Container(
-                                // decoration: BoxDecoration(
-                                //   border: Border.all(color: Colors.black), // Border color
-                                //   borderRadius: BorderRadius.circular(20), // Border radius to make it circular
-                                // ),
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 0), // Add some padding for the text field
                                   child: TextField(
@@ -505,10 +509,6 @@ class _ProfileState extends State<Profile> {
                               ),
                               SizedBox(height: screenHeight * 0.01),
                               Container(
-                                // decoration: BoxDecoration(
-                                //   border: Border.all(color: Colors.black), // Border color
-                                //   borderRadius: BorderRadius.circular(20), // Border radius to make it circular
-                                // ),
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(horizontal: 0), // Add some padding for the text field
                                   child: TextField(
@@ -534,23 +534,23 @@ class _ProfileState extends State<Profile> {
                               SizedBox(height: screenHeight * 0.01),
                               Container(
                                 child: Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 0), // Add some padding for the text field
+                                  padding: EdgeInsets.symmetric(horizontal: 0),
                                   child: TextField(
                                     controller: _phoneController,
                                     inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly, // Allows only digits
-                                      LengthLimitingTextInputFormatter(12), // Limits input to 10 digits
+                                      FilteringTextInputFormatter.digitsOnly,
+                                      LengthLimitingTextInputFormatter(11),
                                     ],
                                     decoration: InputDecoration(
                                       hintText: state.getProfileModel.data!.mobileNumber,
                                       border: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(20.0),
                                       ),
-                                      errorText: _errorText,
+                                      errorText: errorMessage,
                                     ),
                                     keyboardType: TextInputType.phone,
                                     onChanged: (text) {
-                                      _validatePhoneNumber();
+                                      // _validatePhoneNumber();
                                     },
                                   ),
                                 ),
@@ -566,11 +566,9 @@ class _ProfileState extends State<Profile> {
                                     shape: MaterialStateProperty.all(
                                       RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(6),
-
                                       ),
                                     ),
                                     minimumSize: MaterialStateProperty.all(Size(buttonWidth * 3, screenHeight * 0.06)),
-                                    // Set text color to white
                                     foregroundColor: MaterialStateProperty.all(Colors.white),
                                   ),
                                   child: isUploading
@@ -580,7 +578,6 @@ class _ProfileState extends State<Profile> {
                                       : Text('Update', style: TextStyle(fontSize: 18),),
                                 ),
                               ),
-
                             ],
                           ),
                         ),
@@ -642,7 +639,7 @@ class _ProfileState extends State<Profile> {
                           CircleAvatar(
                             radius: screenHeight * 0.06,
                             backgroundColor: Colors.red,
-                            backgroundImage: AssetImage('assets/Home.png'),
+                            backgroundImage: AssetImage('assets/images/dummy_user.jpeg'),
                           ),
                         ],
                       ),

@@ -138,7 +138,7 @@ class _create_passwordState extends State<create_password> {
                       } else if (state is ChangePasswordError) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(state.message!),
+                            content: Text('Please enter both password fields'),
                             backgroundColor: Colors.red,
                           ),
                         );

@@ -107,7 +107,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                       } else if (state is ForgetOtpError) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(state.message!),
+                            content: Text('Please enter valid email'),
                             backgroundColor: Colors.red,
                           ),
                         );

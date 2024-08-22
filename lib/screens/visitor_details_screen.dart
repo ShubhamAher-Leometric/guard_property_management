@@ -231,7 +231,7 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                           padding: const EdgeInsets.symmetric(horizontal: 30.0),
                                           child: GestureDetector(
                                             onTap: () {
-                                              _launchCaller(state.visitorDetailsModel.data!.mobileNumber.toString());
+                                              _launchCaller(state.visitorDetailsModel.data!.ownerMobileNumber.toString());
                                             },
                                             child: Container(
                                               child: Row(
@@ -248,7 +248,8 @@ class _VisitorDetailsScreenState extends State<VisitorDetailsScreen> {
                                                     children: [
                                                       Text('Owner Phone Number',
                                                         style: TextStyle(fontSize: 14,fontWeight: FontWeight.w700),),
-                                                      Text(state.visitorDetailsModel.data!.mobileNumber.toString(),style: TextStyle(fontSize: 12,fontWeight: FontWeight.w400),),
+                                                      Text(state.visitorDetailsModel.data!.ownerMobileNumber.toString(),
+                                                        style: TextStyle(fontSize: 12,fontWeight: FontWeight.w400),),
                                                     ],
                                                   )
                                                 ],

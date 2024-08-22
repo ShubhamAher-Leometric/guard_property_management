@@ -307,7 +307,7 @@ class _OtpPageState extends State<OtpPage> {
                     } else if (state is SubmitForgotOtpError) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(state.message!),
+                          content: Text('Please enter valid Otp'),
                           backgroundColor: Colors.red,
                         ),
                       );

@@ -932,7 +932,7 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
               const SizedBox(height: 16),
               Text(
                 'Block',
-                style: TextStyle(fontSize: 18.0),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               Container(
                 height: 60,
@@ -1030,7 +1030,7 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
               SizedBox(height: 5.0),
               Text(
                 'Floor',
-                style: TextStyle(fontSize: 18.0),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               Container(
                 height: 60,
@@ -1125,10 +1125,10 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                   ),
                 ),
               ),
-              SizedBox(height: 20.0),
+              SizedBox(height: 5.0),
               Text(
                 'Unit Number',
-                style: TextStyle(fontSize: 18.0),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               Container(
                 height: 60,
@@ -1221,7 +1221,7 @@ class _AddNewVisitorState extends State< AddNewVisitor> {
                   ),
                 ),
               ),
-             const SizedBox(height: 16),
+              const SizedBox(height: 16),
               const Text(
                 'Vehicle Number',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
